@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Sprites\Hero.cs">
+    <Files>
+      <File FileName="Assets\Sprites\GameView.cs" Line="173" Column="42" />
+      <File FileName="Assets\Sprites\Hero.cs" Line="58" Column="11" />
+      <File FileName="Assets\Sprites\IActor.cs" Line="8" Column="21" />
+      <File FileName="Assets\Sprites\Main.cs" Line="129" Column="56" />
+      <File FileName="Assets\Sprites\CameraControll.cs" Line="4" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
