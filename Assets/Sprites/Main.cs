@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public enum EModel{
@@ -23,6 +23,8 @@ public class Main : MonoBehaviour {
 	public UIToggle ut_rotate;
 	public UIToggle ut_destroy;
 	public UIButton btn_play;
+	public UIButton btn_save;
+	public UIButton btn_load;
 	
 	Vector3 touchPos;
 	EModel model;
@@ -37,6 +39,8 @@ public class Main : MonoBehaviour {
 		ut_destroy.onChange.Add(new EventDelegate(this, "OnModelChange"));
 		
 		btn_play.onClick.Add(new EventDelegate(this, "OnBtnPlay"));
+		btn_save.onClick.Add(new EventDelegate(this, "OnBtnSave"));
+		btn_load.onClick.Add(new EventDelegate(this, "OnBtnLoad"));
 	}
 	
 	// Update is called once per frame
@@ -114,6 +118,72 @@ public class Main : MonoBehaviour {
 	}
 	
 	void OnBtnPlay(){
+		Save();
+		Application.LoadLevel("Play");
+	}
+	
+	void OnBtnSave(){
+		Save();
+	}
+	
+	void OnBtnLoad(){
+		StartCoroutine(CoBtnLoad());
+	}
+	
+	IEnumerator CoBtnLoad(){
+		string strCubesData = PlayerPrefs.GetString("cubes");
+		if(!string.IsNullOrEmpty(strCubesData)){
+			// 删除已有，除了原方块
+			foreach (Transform tfCube in parent.transform) {
+				if(tfCube.gameObject != oriCube){
+					Destroy(tfCube);
+					yield return 1;
+				}
+			}
+			
+			// 加载子物体，除了原方块（位置为000）
+			string[] strCubes = strCubesData.Split('|');
+			foreach (string item in strCubes) {
+				
+				if(string.IsNullOrEmpty(item)){
+					continue;
+				}
+				
+				string[] posVals = item.Split(',');
+				float localX = float.Parse(posVals[0]);
+				float localY = float.Parse(posVals[1]);
+				float localZ = float.Parse(posVals[2]);
+				if(!(localX == 0 && localY == 0 && localZ == 0)){
+					GameObject cube = Tools.LoadResourcesGameObject("Prefabs/Cube");
+					cube.transform.parent = parent.transform;
+					Vector3 locPos = new Vector3(localX, localY, localZ);
+					cube.transform.localPosition = locPos;
+					cube.transform.localEulerAngles = Vector3.zero;
+					yield return 1;
+				}
+			}
+		}
+		
+		// 创建玩家位置
+		string posPlayer = PlayerPrefs.GetString("playerpos");
+		if(!string.IsNullOrEmpty(posPlayer)){
+			string[] posPlayerVals = posPlayer.Split(',');
+			float x = float.Parse(posPlayerVals[0]);
+			float y = float.Parse(posPlayerVals[1]);
+			float z = float.Parse(posPlayerVals[2]);
+			GameObject cube = Tools.LoadResourcesGameObject("Prefabs/CubePlayerPos");
+			cube.transform.parent = parent.transform;
+			Vector3 locPos = new Vector3(x, y, z);
+			cube.transform.localPosition = locPos;
+			cube.transform.localEulerAngles = Vector3.zero;
+			yield return 1;
+		}
+	}
+	
+	void Save(){
+		parent.transform.position = Vector3.zero;
+		parent.transform.eulerAngles = Vector3.zero;
+		
 		string strCubesData = "";
 		string strPlayerPosData = "";
 		foreach (Transform tfCube in parent.transform) {
@@ -127,7 +197,5 @@ public class Main : MonoBehaviour {
 		// 方块保存数据
 		PlayerPrefs.SetString("cubes", strCubesData);
 		PlayerPrefs.SetString("playerpos", strPlayerPosData);
-		
-		Application.LoadLevel("Play");
 	}
 }

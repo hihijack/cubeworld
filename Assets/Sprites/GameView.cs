@@ -132,13 +132,17 @@ public class GameView : MonoBehaviour
 	}
 	
 	void OnDrag(DragGesture drag){
-		Vector2 deltaMove = drag.DeltaMove * 0.1f;
-		hero.transform.Rotate(0f, -1 * deltaMove.x, 0f, Space.World);
+//		Vector2 deltaMove = drag.DeltaMove * 0.1f;
+//		hero.transform.Rotate(0f, deltaMove.x, 0f, Space.World);
+//		
+//		CameraControll camealControll = main_camera.GetComponent<CameraControll>();
+//		camealControll.OnDrag(drag);
 		
-		main_camera.transform.Rotate(deltaMove.y, -1 * deltaMove.x, 0f, Space.World);
-		Vector3 cameraAngle = main_camera.transform.eulerAngles;
-		cameraAngle.z = 0;
-		main_camera.transform.eulerAngles = cameraAngle;
+//		main_camera.transform.Rotate(deltaMove.y, 0, 0f, Space.World);
+//		Vector3 cameraAngle = main_camera.transform.eulerAngles;
+//		cameraAngle.z = 0;
+//		cameraAngle.y = hero.transform.eulerAngles.y;
+//		main_camera.transform.eulerAngles = cameraAngle;
 	}
 	
 	IEnumerator InitWorld(){
@@ -173,7 +177,8 @@ public class GameView : MonoBehaviour
 		gobjHero.transform.position = playerPos;
 		
 		CameraControll camealControll = main_camera.GetComponent<CameraControll>();
-		camealControll.target = gobjHero;
+		camealControll.target = gobjHero.transform;
+		camealControll.Init();
 		
 		hero = gobjHero.GetComponent<Hero>();
 		
