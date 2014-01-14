@@ -1,0 +1,17 @@
+﻿[
+  {
+    "id": 1,
+    "name": "方块",
+    "resources_name": "cube"
+  },
+  {
+    "id": 2,
+    "name": "玩家",
+    "resources_name": "player"
+  },
+    {
+    "id": 3,
+    "name": "宝箱",
+    "resources_name": "chest"
+  }
+]

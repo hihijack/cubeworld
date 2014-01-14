@@ -15,8 +15,24 @@ public class GameView : MonoBehaviour
 	
 	public int VCInput_Axis;
 	public int VCInput_Ver_Axis;
-	public int VCInput_BtnA;
-	public int VCInput_BtnB;
+	private int _vcInputBtnA;
+	public int VCInputBtnA{
+		get{
+			return _vcInputBtnA;
+		}
+		set{
+			_vcInputBtnA = value;
+		}
+	}
+	private int _vcInputBtnB;
+	public int VCInputBtnB{
+		get{
+			return _vcInputBtnB;
+		}
+		set{
+			_vcInputBtnB = value;
+		}
+	}
 	
 	public EGameState gameState;
 	
@@ -57,15 +73,15 @@ public class GameView : MonoBehaviour
 		}
 		
 		if(Input.GetKeyDown(KeyCode.Space)){
-			VCInput_BtnA = 1;
-		}else if(Input.GetKeyUp(KeyCode.Space)){
-			VCInput_BtnA = 0;
+			VCInputBtnA = 1;
+		}else{
+			VCInputBtnA = 0;
 		}
 		
 		if(Input.GetKeyDown(KeyCode.X)){
-			VCInput_BtnB = 1;
-		}else if(Input.GetKeyUp(KeyCode.X)){
-			VCInput_BtnB = 0;
+			VCInputBtnB  = 1;
+		}else{
+			VCInputBtnB = 0;
 		}
 		#endif
 		if(hero != null){
@@ -78,7 +94,11 @@ public class GameView : MonoBehaviour
 //		VCInput_BtnB = 0;
 //		VCInput_Ver_Axis = 0;
 	}
-
+	
+	
+	void OnGUI(){
+		GUI.Label(new Rect(50,50,100,100), VCInputBtnA.ToString());
+	}
 	//×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
 	
 	public void OnBtnPress(string btnname, bool isDown){
@@ -113,18 +133,28 @@ public class GameView : MonoBehaviour
 		
 		if("btn_A".Equals(btnname)){
 			if(isDown){
-				VCInput_BtnA = 1;
+				VCInputBtnA = 1;
 			}else{
-				VCInput_BtnA = 0;
+				VCInputBtnA = 0;
 			}
 		}
 		if("btn_B".Equals(btnname)){
 			if(isDown){
-				VCInput_BtnB = 1;
+				VCInputBtnB  = 1;
 			}else{
-				VCInput_BtnB = 0;
+				VCInputBtnB = 0;
 			}
 		}
+		
+		if("btn_back".Equals(btnname)){
+			if(isDown){
+				BackToCreate();
+			}
+		}
+	}
+	
+	void BackToCreate(){
+		Application.LoadLevel("Main");
 	}
 	
 	public bool IsInGameState(EGameState gameState){

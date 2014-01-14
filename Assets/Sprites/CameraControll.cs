@@ -20,7 +20,9 @@ public class CameraControll : MonoBehaviour
 	private float angleV = 0f;
 	private float rollSpeed = 360f;
 	private bool isFAP = false;//是否第一视角
-
+	
+	public Camera cameraUI;
+	
 	void LateUpdate ()
 	{
 		// Early out if we don't have a target
@@ -28,11 +30,18 @@ public class CameraControll : MonoBehaviour
 			return;
 			
 		bool isRight = false;
+		
 		//镜头控制
-		if (Input.GetMouseButton (0)) {
-			angleH += Mathf.Clamp (Input.GetAxis ("Mouse X"), -1, 1) * horizontalAimingSpeed * Time.deltaTime;
-			angleV -= Mathf.Clamp (Input.GetAxis ("Mouse Y"), -1, 1) * verticalAimingSpeed * Time.deltaTime;		
-			isRight = true;
+		if (Input.GetMouseButton (0) || Input.GetMouseButton(1)) {
+			string touchLayerName = Tools.GetTouchLayer(cameraUI);
+			
+			if(!touchLayerName.Contains("UI")){
+				angleH += Mathf.Clamp (Input.GetAxis ("Mouse X"), -1, 1) * horizontalAimingSpeed * Time.deltaTime;
+				angleV -= Mathf.Clamp (Input.GetAxis ("Mouse Y"), -1, 1) * verticalAimingSpeed * Time.deltaTime;		
+				if(Input.GetMouseButton (0)){
+					isRight = true;
+				}
+			}
 		}
 		//滚轮
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0) {

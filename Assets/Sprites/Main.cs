@@ -41,6 +41,8 @@ public class Main : MonoBehaviour {
 		btn_play.onClick.Add(new EventDelegate(this, "OnBtnPlay"));
 		btn_save.onClick.Add(new EventDelegate(this, "OnBtnSave"));
 		btn_load.onClick.Add(new EventDelegate(this, "OnBtnLoad"));
+		
+		StartCoroutine(CoBtnLoad());
 	}
 	
 	// Update is called once per frame
@@ -195,7 +197,12 @@ public class Main : MonoBehaviour {
 			}
 		}
 		// 方块保存数据
-		PlayerPrefs.SetString("cubes", strCubesData);
-		PlayerPrefs.SetString("playerpos", strPlayerPosData);
+		if(!string.IsNullOrEmpty(strCubesData)){
+			PlayerPrefs.SetString("cubes", strCubesData);
+		}
+		
+		if(!string.IsNullOrEmpty(strPlayerPosData)){
+			PlayerPrefs.SetString("playerpos", strPlayerPosData);
+		}
 	}
 }

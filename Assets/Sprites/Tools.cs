@@ -228,6 +228,25 @@ public static class Tools{
 			Debug.LogError("can't find material:" + materialName);
 		}
 	}
+	
+	public static string GetTouchLayer(Camera camera){
+		string strLayer = "";
+		Vector3 posMouse = Input.mousePosition;
+		posMouse.z = 10;
+		
+		Ray ray = camera.ScreenPointToRay(posMouse);
+		RaycastHit[] rhs;
+		rhs = Physics.RaycastAll(ray);
+		if(rhs != null){
+			foreach (RaycastHit rh in rhs) {
+				GameObject gobjHit = rh.collider.gameObject;
+				if(gobjHit != null){
+					strLayer += LayerMask.LayerToName(gobjHit.layer);
+				}
+			}
+		}
+		return strLayer;
+	}
 }
 
 public class BtnAction{

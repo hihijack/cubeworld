@@ -28,12 +28,15 @@ public class Hero : IActor
 	
 	bool canSecondJump = false;
 	
+	Animation anim;
+	
 	void Start(){
 		isEnermy = false;
 		actor_type = EActorType.Hero;
 		cc = GetComponent<CharacterController>();
 		state = new HeroActorState_Idle(this);
 		gameView = GameObject.Find("CPU").GetComponent<GameView>();
+		anim = Tools.GetComponentInChildByPath<Animation>(gameObject,"model");
 	}
 	
 	void Update(){
@@ -46,8 +49,8 @@ public class Hero : IActor
 	public void DoUpdate(){
 		axisH = gameView.VCInput_Axis;
 		axisV = gameView.VCInput_Ver_Axis;
-		btnA = gameView.VCInput_BtnA;
-		btnB = gameView.VCInput_BtnB;
+		btnA = gameView.VCInputBtnA;
+		btnB = gameView.VCInputBtnB;
 		moveDir.z = 0f;
 		moveDir.x = 0f;
 		this.state.DoUpdata();
@@ -98,10 +101,12 @@ public class Hero : IActor
 	
 	public override void OnEnterIdle ()
 	{
+		PlayAnim("Stand");
 	}
 	
 	public override void OnEnterRun ()
 	{
+		PlayAnim("Run");
 	}
 	
 	public override void OnEnterOnAirDown ()
@@ -135,6 +140,8 @@ public class Hero : IActor
 		moveDir.y = jumpSpeedTemp;
 		
 		canSecondJump = false;
+		
+		PlayAnim("JumpStart");
 	} 
 	
 	public override void DoUpdateOnAirUp ()
@@ -190,12 +197,20 @@ public class Hero : IActor
 
 	}
 	
-	void OnTriggerEnter(Collider other){
-		GameObject gobjOther = other.gameObject;
-	}
-
-	
 	void Killed(){
 		
+	}
+	
+	void OnTriggerEnter(Collider other) {
+		ITrigger it = other.GetComponent<ITrigger>();
+		if(it != null){
+			it.OnTrigger(gameObject);
+		}
+	}
+	
+	public void PlayAnim(string animName){
+		if(anim != null){
+			anim.CrossFade(animName);
+		}
 	}
 }
