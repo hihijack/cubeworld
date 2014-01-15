@@ -40,3 +40,9 @@ public enum EActorType{
 	Gard,
 	Hero
 }
+
+public class BuildItem{
+	int id;
+	string name;
+	string resourceName;
+}
