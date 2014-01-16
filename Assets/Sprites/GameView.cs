@@ -97,7 +97,7 @@ public class GameView : MonoBehaviour
 	
 	
 	void OnGUI(){
-		GUI.Label(new Rect(50,50,100,100), VCInputBtnA.ToString());
+//		GUI.Label(new Rect(50,50,100,100), VCInputBtnA.ToString());
 	}
 	//×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
 	
@@ -185,10 +185,11 @@ public class GameView : MonoBehaviour
 			}
 			
 			string[] posVals = item.Split(',');
-			float localX = float.Parse(posVals[0]);
-			float localY = float.Parse(posVals[1]);
-			float localZ = float.Parse(posVals[2]);
-			GameObject cube = Tools.LoadResourcesGameObject("Prefabs/Cube");
+			string itemName = posVals[0];
+			float localX = float.Parse(posVals[1]);
+			float localY = float.Parse(posVals[2]);
+			float localZ = float.Parse(posVals[3]);
+			GameObject cube = Tools.LoadResourcesGameObject(IPath.BuildItems + itemName);
 			cube.transform.parent = cubeParent.transform;
 			Vector3 locPos = new Vector3(localX, localY, localZ);
 			cube.transform.localPosition = locPos;

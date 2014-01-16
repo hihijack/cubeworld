@@ -1,0 +1,36 @@
+-- phpMyAdmin SQL Dump
+-- version 2.11.2.1
+-- http://www.phpmyadmin.net
+--
+-- 主机: localhost
+-- 生成日期: 2014 年 01 月 16 日 14:33
+-- 服务器版本: 5.0.45
+-- PHP 版本: 5.2.5
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+--
+-- 数据库: `cubeworld`
+--
+CREATE DATABASE `cubeworld` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `cubeworld`;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(10) NOT NULL,
+  `worlddata` text,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- 导出表中的数据 `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `worlddata`) VALUES
+(0, 'lhj', NULL);

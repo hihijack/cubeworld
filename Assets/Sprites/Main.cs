@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Text;
 
 public enum EModel{
 	Create,
@@ -17,25 +18,43 @@ public class Main : MonoBehaviour {
 	
 	public GameObject oriCube;
 	
-	public UIToggle ut_create;
-	public UIToggle ut_createPlayer;
-	public UIToggle ut_move;
-	public UIToggle ut_rotate;
+	public GameObject g_GobjBtns;
 	public UIToggle ut_destroy;
 	public UIButton btn_play;
 	public UIButton btn_save;
 	public UIButton btn_load;
+	
+	public float cameraSpeed = 2f;
 	
 	Vector3 touchPos;
 	EModel model;
 	
 	Vector3 touchPosFirst;
 	
+	BuildItem _curBuildItem;
+	BuildItem CurBuildItem{
+		set{
+			_curBuildItem = value;
+		}
+		
+		get{
+			return _curBuildItem;
+		}
+	}
+	
+	int[] defaultBuildItemId = {1, 2, 3};
+	
+	int axisV = 0;
+	int axisH = 0;
+	
 	void Start () {
-		ut_create.onChange.Add(new EventDelegate(this, "OnModelChange"));
-		ut_createPlayer.onChange.Add(new EventDelegate(this, "OnModelChange"));
-		ut_move.onChange.Add(new EventDelegate(this, "OnModelChange"));
-		ut_rotate.onChange.Add(new EventDelegate(this, "OnModelChange"));
+		
+		// init start
+		GameResources.InitBaseData();
+		// init end
+		
+		InitBuildItemUI();
+		
 		ut_destroy.onChange.Add(new EventDelegate(this, "OnModelChange"));
 		
 		btn_play.onClick.Add(new EventDelegate(this, "OnBtnPlay"));
@@ -47,6 +66,9 @@ public class Main : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
+		camera.transform.Translate(axisH * cameraSpeed, axisV * cameraSpeed, 0);
+		
 		if(Input.GetMouseButtonDown(0)){
 			
 			Vector3 posMouse = Input.mousePosition;
@@ -61,23 +83,18 @@ public class Main : MonoBehaviour {
 					if(model == EModel.Create){
 						Vector3 normalHit = rh.normal;
 						Vector3 posNew = gobjHit.transform.position + normalHit;
-						GameObject gobjCube = Instantiate(cube) as  GameObject;
-						gobjCube.transform.parent = parent.transform;
-						gobjCube.transform.position = posNew ;
-						gobjCube.transform.localEulerAngles = Vector3.zero;
+						
+						GameObject gobjItem = Tools.LoadResourcesGameObject(IPath.BuildItems + CurBuildItem.resourceName);
+						gobjItem.name = CurBuildItem.resourceName;
+						
+						gobjItem.transform.parent = parent.transform;
+						gobjItem.transform.position = posNew ;
+						gobjItem.transform.localEulerAngles = Vector3.zero;
 					}
 					else if(model == EModel.Destroy){
 						if(gobjHit != oriCube){
 							DestroyObject(gobjHit);
 						}
-					}
-					else if(model == EModel.CreatePlayer){
-						Vector3 normalHit = rh.normal;
-						Vector3 posNew = gobjHit.transform.position + normalHit;
-						GameObject gobjCube = Tools.LoadResourcesGameObject("Prefabs/CubePlayerPos");
-						gobjCube.transform.parent = parent.transform;
-						gobjCube.transform.position = posNew ;
-						gobjCube.transform.localEulerAngles = Vector3.zero;
 					}
 				}
 			}
@@ -85,38 +102,40 @@ public class Main : MonoBehaviour {
 	}
 	
 	public void OnModelChange(){
+		
 		UIToggle utCur = UIToggle.current;
 		if(utCur != null && (utCur.value == true)){
-			if(utCur.name.Equals("tg_create")){
+			if(utCur.name.Contains("tg_create")){
 				model = EModel.Create;
+				DataCache dc = utCur.gameObject.GetComponent<DataCache>();
+				CurBuildItem = dc.data as BuildItem;
 			}else if(utCur.name.Equals("tg_move")){
 				model = EModel.Move;
 			}else if(utCur.name.Equals("tg_rotate")){
 				model = EModel.Rotate;
 			}else if(utCur.name.Equals("tg_destroy")){
 				model = EModel.Destroy;
-			}else if(utCur.name.Equals("tg_create_player")){
-				model = EModel.CreatePlayer;
 			}
 		}
 	}
 	
 	void OnDrag(DragGesture gesture){
-		if(model == EModel.Move){
-			Vector3 move = gesture.DeltaMove * 0.05f;
-			parent.transform.Translate(move, Space.World);
-		}else if(model == EModel.Rotate){
-			Vector3 move = gesture.DeltaMove * 0.3f;
-			parent.transform.Rotate(move.y, -1 * move.x, 0f, Space.World);
-		}
-		
+		Vector3 move = gesture.DeltaMove * 0.3f;
+		camera.transform.Rotate(move.y, -1 * move.x, 0f);
+		Vector3 angle = camera.transform.eulerAngles;
+		angle.z = 0;
+		camera.transform.eulerAngles = angle;
+//		if(model == EModel.Move){
+//			Vector3 move = gesture.DeltaMove * 0.05f;
+//			camera.transform.Translate(move, Space.World);
+//		}else if(model == EModel.Rotate){
+//			
+//		}
 	}
 	
 	void OnPinch(PinchGesture gesture){
 		float delta = gesture.Delta;
-		Vector3 pos = camera.transform.position;
-		pos.z += (delta * 0.05f);
-		camera.transform.position = pos;
+		camera.transform.Translate(0f, 0f, delta * 0.05f);
 	}
 	
 	void OnBtnPlay(){
@@ -152,11 +171,13 @@ public class Main : MonoBehaviour {
 				}
 				
 				string[] posVals = item.Split(',');
-				float localX = float.Parse(posVals[0]);
-				float localY = float.Parse(posVals[1]);
-				float localZ = float.Parse(posVals[2]);
+				string itemName = posVals[0];
+				float localX = float.Parse(posVals[1]);
+				float localY = float.Parse(posVals[2]);
+				float localZ = float.Parse(posVals[3]);
 				if(!(localX == 0 && localY == 0 && localZ == 0)){
-					GameObject cube = Tools.LoadResourcesGameObject("Prefabs/Cube");
+					GameObject cube = Tools.LoadResourcesGameObject(IPath.BuildItems + itemName);
+					cube.name = itemName;
 					cube.transform.parent = parent.transform;
 					Vector3 locPos = new Vector3(localX, localY, localZ);
 					cube.transform.localPosition = locPos;
@@ -173,7 +194,7 @@ public class Main : MonoBehaviour {
 			float x = float.Parse(posPlayerVals[0]);
 			float y = float.Parse(posPlayerVals[1]);
 			float z = float.Parse(posPlayerVals[2]);
-			GameObject cube = Tools.LoadResourcesGameObject("Prefabs/CubePlayerPos");
+			GameObject cube = Tools.LoadResourcesGameObject(IPath.BuildItems + "player");
 			cube.transform.parent = parent.transform;
 			Vector3 locPos = new Vector3(x, y, z);
 			cube.transform.localPosition = locPos;
@@ -186,16 +207,22 @@ public class Main : MonoBehaviour {
 		parent.transform.position = Vector3.zero;
 		parent.transform.eulerAngles = Vector3.zero;
 		
-		string strCubesData = "";
 		string strPlayerPosData = "";
+		string strCubesData = "";
+		
+		StringBuilder strBuilder = new StringBuilder();
+		
 		foreach (Transform tfCube in parent.transform) {
-			if(tfCube.CompareTag("Cube")){
-				string strData = tfCube.localPosition.x + "," + tfCube.localPosition.y + "," + tfCube.localPosition.z + "|";
-				strCubesData += strData;
-			}else if(tfCube.CompareTag("PlayerPos")){
+			if(tfCube.CompareTag("PlayerPos")){
 				strPlayerPosData = tfCube.position.x + "," + tfCube.position.y + "," + tfCube.position.z;
+			}else{
+				string strData = tfCube.name + "," + tfCube.localPosition.x + "," + tfCube.localPosition.y + "," + tfCube.localPosition.z + "|";
+				strBuilder.Append(strData);	
 			}
 		}
+		
+		strCubesData = strBuilder.ToString();
+		
 		// 方块保存数据
 		if(!string.IsNullOrEmpty(strCubesData)){
 			PlayerPrefs.SetString("cubes", strCubesData);
@@ -203,6 +230,60 @@ public class Main : MonoBehaviour {
 		
 		if(!string.IsNullOrEmpty(strPlayerPosData)){
 			PlayerPrefs.SetString("playerpos", strPlayerPosData);
+		}
+	}
+	
+	void InitBuildItemUI(){
+		for (int i = 0; i < defaultBuildItemId.Length; i++) {
+			int id = defaultBuildItemId[i];
+			BuildItem buildItem = GameResources.GetBuildItemBD(id);
+			
+			if(buildItem != null){
+				string iconName = "icon_" + buildItem.resourceName;
+				GameObject gobjItem = Tools.GetGameObjectInChildByPathSimple(g_GobjBtns, "tg_create_" + i);
+				UISprite icon = Tools.GetComponentInChildByPath<UISprite>(gobjItem, "icon");
+				icon.spriteName = iconName;
+				DataCache dc = gobjItem.AddComponent<DataCache>();
+				dc.data = buildItem;
+				
+				UIToggle ut = gobjItem.GetComponent<UIToggle>();
+				ut.onChange.Add(new EventDelegate(this, "OnModelChange"));
+				
+				if(ut.startsActive){
+					CurBuildItem = buildItem;
+				}
+			}
+		}
+	}
+	
+	public void OnBtnPress(string btnname, bool isDown){
+		if("btn_down".Equals(btnname)){
+			if(isDown){
+				axisV = -1;
+			}else{
+				axisV = 0;
+			}
+		}
+		if("btn_up".Equals(btnname)){
+			if(isDown){
+				axisV = 1;
+			}else{
+				axisV = 0;
+			}
+		}
+		if("btn_left".Equals(btnname)){
+			if(isDown){
+				axisH = -1;
+			}else{
+				axisH = 0;
+			}
+		}
+		if("btn_right".Equals(btnname)){
+			if(isDown){
+				axisH = 1;
+			}else{
+				axisH = 0;
+			}
 		}
 	}
 }

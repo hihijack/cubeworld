@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.ComponentModel;
 using System;
+using SimpleJSON;
 
 public enum ECommandAI{
 	COMMAND_NONE,
@@ -42,7 +43,13 @@ public enum EActorType{
 }
 
 public class BuildItem{
-	int id;
-	string name;
-	string resourceName;
+	public int id;
+	public string name;
+	public string resourceName;
+	
+	public BuildItem(JSONNode jd){
+		id = jd["id"].AsInt;
+		name = jd["name"];
+		resourceName = jd["resources_name"];
+	}
 }
