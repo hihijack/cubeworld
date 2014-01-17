@@ -247,6 +247,51 @@ public static class Tools{
 		}
 		return strLayer;
 	}
+	
+	public static bool IsTouchLayer(Camera cameraSeeTheLayer, string layer){
+		bool r = false;
+		string strLayer = "";
+		Vector3 posMouse = Input.mousePosition;
+		posMouse.z = 10;
+		
+		Ray ray = cameraSeeTheLayer.ScreenPointToRay(posMouse);
+		RaycastHit[] rhs;
+		rhs = Physics.RaycastAll(ray);
+		if(rhs != null){
+			foreach (RaycastHit rh in rhs) {
+				GameObject gobjHit = rh.collider.gameObject;
+				if(gobjHit != null){
+					strLayer += LayerMask.LayerToName(gobjHit.layer);
+				}
+			}
+		}
+		
+		if(!string.IsNullOrEmpty(strLayer)){
+			if(strLayer.Contains(layer)){
+				r = true;
+			}
+		}
+		return r;
+	}
+	
+	public static GameObject LoadResourcePrefab(string path){
+		UnityEngine.GameObject obj = Resources.Load(path) as GameObject;
+		return obj != null ? obj : null;
+	}
+	
+	public static GameObject AddNGUIChild(GameObject gobjParent, string path){
+		GameObject r = null;
+		//Debug.LogError("path:"+path);
+		GameObject gobjPrefab = LoadResourcePrefab(path);
+		if(gobjParent != null && gobjPrefab != null){
+			 r = NGUITools.AddChild(gobjParent, gobjPrefab);
+		}else{
+			#if UNITY_EDITOR||UNITY_STANDALONE_WIN
+			Debug.LogError("Error In AddNGUIChild:" + path);
+			#endif
+		}
+		return r;
+	}
 }
 
 public class BtnAction{
