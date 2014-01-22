@@ -30,6 +30,18 @@ public class Hero : IActor
 	
 	Animation anim;
 	
+	IInteractive _curInteract;// 当前交互
+	IInteractive CurInteract{
+		get{
+			return _curInteract;
+		}
+		
+		set{
+			print("set" + value);//######
+			_curInteract = value;
+		}
+	}
+	
 	void Start(){
 		isEnermy = false;
 		actor_type = EActorType.Hero;
@@ -75,6 +87,8 @@ public class Hero : IActor
 					updataState(new IActorAction(EFSMAction.HERO_RUN));
 				}else if(btnA > 0){
 					updataState(new IActorAction(EFSMAction.HERO_ONAIR_UP));
+				}else if(btnB > 0){
+					InteractCur();
 				}
 			}
 		}
@@ -188,9 +202,11 @@ public class Hero : IActor
 		return g_gobjCurStepOn;
 	}
 	#region Game Mehtods
-	#endregion
-	
-	#region InteractiveEventHandle
+	void InteractCur(){
+		if(CurInteract != null){
+			CurInteract.OnInteract(gameObject);
+		}	
+	}	
 	#endregion
 	
 	void OnControllerColliderHit(ControllerColliderHit hit) {
@@ -202,9 +218,19 @@ public class Hero : IActor
 	}
 	
 	void OnTriggerEnter(Collider other) {
-		ITrigger it = other.GetComponent<ITrigger>();
-		if(it != null){
-			it.OnTrigger(gameObject);
+		if(other.CompareTag("Trigger")){
+			ITrigger it = other.GetComponent<ITrigger>();
+			if(it != null){
+				it.OnTrigger(gameObject);
+			}
+		}else if(other.CompareTag("Interactive")){
+			CurInteract = other.GetComponent<IInteractive>();
+		}
+	}
+	
+	void OnTriggerExit(Collider other){
+		if(other.CompareTag("Interactive")){
+			CurInteract = null;
 		}
 	}
 	

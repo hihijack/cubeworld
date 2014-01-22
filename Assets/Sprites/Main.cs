@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using SimpleJSON;
 
 public enum EModel{
 	Create,
@@ -19,10 +20,12 @@ public class Main : MonoBehaviour {
 	public GameObject oriCube;
 	
 	public GameObject g_GobjBtns;
+	public GameObject g_GobjPlane;
+	
 	public UIToggle ut_destroy;
 	public UIButton btn_play;
 	public UIButton btn_save;
-	public UIButton btn_load;
+	public UIButton btn_back;
 	
 	public float cameraSpeed = 2f;
 	
@@ -48,20 +51,22 @@ public class Main : MonoBehaviour {
 	int axisH = 0;
 	
 	void Start () {
-		
-		// init start
-		GameResources.InitBaseData();
-		// init end
-		
 		InitBuildItemUI();
+		
+		UISetVerifty();
 		
 		ut_destroy.onChange.Add(new EventDelegate(this, "OnModelChange"));
 		
 		btn_play.onClick.Add(new EventDelegate(this, "OnBtnPlay"));
 		btn_save.onClick.Add(new EventDelegate(this, "OnBtnSave"));
-		btn_load.onClick.Add(new EventDelegate(this, "OnBtnLoad"));
 		
-		StartCoroutine(CoBtnLoad());
+		btn_back.onClick.Add(new EventDelegate(this, "OnBackToMenu"));
+		
+		if(!string.IsNullOrEmpty(GameManager.MyWorldDataCache)){
+			StartCoroutine(CoInitWorld(GameManager.MyWorldDataCache));
+		}else{
+			StartCoroutine(CoRequestWorldData());
+		}
 	}
 	
 	// Update is called once per frame
@@ -90,10 +95,17 @@ public class Main : MonoBehaviour {
 						gobjItem.transform.parent = parent.transform;
 						gobjItem.transform.position = posNew ;
 						gobjItem.transform.localEulerAngles = Vector3.zero;
+						
+						if(GameManager.IsVerify){
+							UISetVerifty(false);
+						}
 					}
 					else if(model == EModel.Destroy){
 						if(gobjHit != oriCube){
 							DestroyObject(gobjHit);
+							if(GameManager.IsVerify){
+								UISetVerifty(false);
+							}
 						}
 					}
 				}
@@ -139,20 +151,68 @@ public class Main : MonoBehaviour {
 	}
 	
 	void OnBtnPlay(){
-		Save();
-		Application.LoadLevel("Play");
+		Save(true);
 	}
 	
 	void OnBtnSave(){
-		Save();
+		Save(false);
 	}
 	
-	void OnBtnLoad(){
-		StartCoroutine(CoBtnLoad());
+//	void OnBtnLoad(){
+//		StartCoroutine(CoRequestWorldData());
+//	}
+	
+	IEnumerator CoRequestWorldData(){
+		WWW myWWW = new WWW("http://localhost/cwserver/getworlddata.php?playerid=" + GameManager.CurPlayerId);
+		yield return  myWWW;
+		
+		string strRes = myWWW.text;
+		
+		print("Response:" + strRes);//##########
+		
+		
+		if(!string.IsNullOrEmpty(strRes)){
+			JSONNode jd = JSONNode.Parse(strRes);
+			string strWorlddata = jd["worlddata"];
+			int verify = jd["verify"].AsInt;
+			
+			GameManager.IsVerify = verify > 0 ? true : false;
+			
+			GameManager.MyWorldDataCache = strWorlddata;
+			StartCoroutine(CoInitWorld(strWorlddata));
+		}
+		
+		UISetVerifty();
+		
 	}
 	
-	IEnumerator CoBtnLoad(){
-		string strCubesData = PlayerPrefs.GetString("cubes");
+	void UISetVerifty(){
+		UILabel txtVerify = Tools.GetComponentInChildByPath<UILabel>(g_GobjPlane, "btns/txt_verify");
+		if(GameManager.IsVerify){
+			txtVerify.text = "已验证";
+			txtVerify.color = Color.green;
+		}else{
+			txtVerify.text = "未验证";
+			txtVerify.color = Color.red;
+		}
+	}
+	
+	void UISetVerifty(bool verify){
+		UILabel txtVerify = Tools.GetComponentInChildByPath<UILabel>(g_GobjPlane, "btns/txt_verify");
+		if(verify){
+			txtVerify.text = "已验证";
+			txtVerify.color = Color.green;
+		}else{
+			txtVerify.text = "未验证";
+			txtVerify.color = Color.red;
+		}
+	}
+	
+	IEnumerator CoInitWorld(string worlddata){
+		string[] strsData = worlddata.Split('_');
+		
+		string strCubesData = strsData[0];
+		
 		if(!string.IsNullOrEmpty(strCubesData)){
 			// 删除已有，除了原方块
 			foreach (Transform tfCube in parent.transform) {
@@ -188,7 +248,7 @@ public class Main : MonoBehaviour {
 		}
 		
 		// 创建玩家位置
-		string posPlayer = PlayerPrefs.GetString("playerpos");
+		string posPlayer = strsData[1];
 		if(!string.IsNullOrEmpty(posPlayer)){
 			string[] posPlayerVals = posPlayer.Split(',');
 			float x = float.Parse(posPlayerVals[0]);
@@ -203,7 +263,7 @@ public class Main : MonoBehaviour {
 		}
 	}
 	
-	void Save(){
+	void Save(bool toPlay){
 		parent.transform.position = Vector3.zero;
 		parent.transform.eulerAngles = Vector3.zero;
 		
@@ -224,12 +284,37 @@ public class Main : MonoBehaviour {
 		strCubesData = strBuilder.ToString();
 		
 		// 方块保存数据
-		if(!string.IsNullOrEmpty(strCubesData)){
-			PlayerPrefs.SetString("cubes", strCubesData);
+		if(!string.IsNullOrEmpty(strCubesData) && !string.IsNullOrEmpty(strPlayerPosData)){
+			string strData = strCubesData + "_" + strPlayerPosData;
+			StartCoroutine(CoRequestSaveCubeData(strData, toPlay));
+		}else{
+			GeneralShowTip("必须创建一个玩家初始位置");
 		}
+	}
+	
+	IEnumerator CoRequestSaveCubeData(string cubedata, bool toPlay){
+		WWW myWWW = new WWW("http://localhost/cwserver/saveworlddata.php?playerid=" + GameManager.CurPlayerId + "&" + "worlddata=" + cubedata);
+		yield return  myWWW;
 		
-		if(!string.IsNullOrEmpty(strPlayerPosData)){
-			PlayerPrefs.SetString("playerpos", strPlayerPosData);
+		string strRes = myWWW.text;
+		
+		print("Response:" + strRes);//##########
+		
+		JSONNode jd = JSONNode.Parse(strRes);
+		int state = jd["state"].AsInt;
+		
+		if(state == 0){
+			// 成功
+			GeneralShowTip("保存成功");
+			GameManager.MyWorldDataCache = cubedata;
+			if(toPlay){
+				GameManager.PlayModel = EPlayModel.Mine;
+				GameManager.IsVerify = false;
+				Application.LoadLevel("Play");
+			}
+		}else{
+			// 失败
+			GeneralShowTip("保存失败");
 		}
 	}
 	
@@ -285,5 +370,22 @@ public class Main : MonoBehaviour {
 				axisH = 0;
 			}
 		}
+	}
+	
+	void GeneralShowTip(string txt){
+		GameObject gobjTip = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "tip");
+		UILabel txtTip = Tools.GetComponentInChildByPath<UILabel>(gobjTip, "txt");
+		txtTip.text = txt;
+		StartCoroutine(CoUITipTiming(gobjTip, 2f));
+	}
+	
+	IEnumerator CoUITipTiming(GameObject gobj, float dur){
+		yield return new WaitForSeconds(dur);
+		DestroyObject(gobj);
+	}
+	
+	
+	void OnBackToMenu(){
+		Application.LoadLevel("Login");
 	}
 }

@@ -44,6 +44,8 @@ public class GameView : MonoBehaviour
 	
 	bool initFinish = false;
 	
+	public GameObject g_GobjPlane;
+	
 	void Start ()
 	{
 		// init hero
@@ -148,13 +150,21 @@ public class GameView : MonoBehaviour
 		
 		if("btn_back".Equals(btnname)){
 			if(isDown){
-				BackToCreate();
+				if(GameManager.PlayModel == EPlayModel.Mine){
+					BackToCreate();
+				}else{
+					BackToMenu();
+				}
 			}
 		}
 	}
 	
 	void BackToCreate(){
 		Application.LoadLevel("Main");
+	}
+	
+	void BackToMenu(){
+		Application.LoadLevel("Login");
 	}
 	
 	public bool IsInGameState(EGameState gameState){
@@ -176,45 +186,69 @@ public class GameView : MonoBehaviour
 	}
 	
 	IEnumerator InitWorld(){
-		string strCubesData = PlayerPrefs.GetString("cubes");
-		string[] strCubes = strCubesData.Split('|');
-		foreach (string item in strCubes) {
-			
-			if(string.IsNullOrEmpty(item)){
-				continue;
+		string worldData = "";
+		if(GameManager.PlayModel == EPlayModel.Mine && !string.IsNullOrEmpty(GameManager.MyWorldDataCache)){
+			worldData = GameManager.MyWorldDataCache;
+		}else if(GameManager.PlayModel == EPlayModel.Others && !string.IsNullOrEmpty(GameManager.OtherWorldDataCache)){
+			worldData = GameManager.OtherWorldDataCache;
+		}
+		if(!string.IsNullOrEmpty(worldData)){
+			string[] strsData = worldData.Split('_');
+			string strCubesData = strsData[0];
+			string[] strCubes = strCubesData.Split('|');
+			foreach (string item in strCubes) {
+				
+				if(string.IsNullOrEmpty(item)){
+					continue;
+				}
+				
+				string[] posVals = item.Split(',');
+				string itemName = posVals[0];
+				float localX = float.Parse(posVals[1]);
+				float localY = float.Parse(posVals[2]);
+				float localZ = float.Parse(posVals[3]);
+				GameObject cube = Tools.LoadResourcesGameObject(IPath.BuildItems + itemName);
+				
+				print(itemName);//#########
+				
+				cube.transform.parent = cubeParent.transform;
+				Vector3 locPos = new Vector3(localX, localY, localZ);
+				cube.transform.localPosition = locPos;
+				yield return 1;
 			}
 			
-			string[] posVals = item.Split(',');
-			string itemName = posVals[0];
-			float localX = float.Parse(posVals[1]);
-			float localY = float.Parse(posVals[2]);
-			float localZ = float.Parse(posVals[3]);
-			GameObject cube = Tools.LoadResourcesGameObject(IPath.BuildItems + itemName);
-			cube.transform.parent = cubeParent.transform;
-			Vector3 locPos = new Vector3(localX, localY, localZ);
-			cube.transform.localPosition = locPos;
+			// 创建玩家
+			string posPlayer = strsData[1];
+			string[] posPlayerVals = posPlayer.Split(',');
+			float x = float.Parse(posPlayerVals[0]);
+			float y = float.Parse(posPlayerVals[1]);
+			float z = float.Parse(posPlayerVals[2]);
+			Vector3 playerPos = new Vector3(x, y + 0.6f, z);
+			
+			GameObject gobjHero = Tools.LoadResourcesGameObject("Prefabs/player");
+			gobjHero.transform.position = playerPos;
+			
+			CameraControll camealControll = main_camera.GetComponent<CameraControll>();
+			camealControll.target = gobjHero.transform;
+			camealControll.Init();
+			
+			hero = gobjHero.GetComponent<Hero>();
+			
+			initFinish = true;
+			
 			yield return 1;
 		}
-		
-		// 创建玩家
-		string posPlayer = PlayerPrefs.GetString("playerpos");
-		string[] posPlayerVals = posPlayer.Split(',');
-		float x = float.Parse(posPlayerVals[0]);
-		float y = float.Parse(posPlayerVals[1]);
-		float z = float.Parse(posPlayerVals[2]);
-		Vector3 playerPos = new Vector3(x, y + 0.6f, z);
-		
-		GameObject gobjHero = Tools.LoadResourcesGameObject("Prefabs/player");
-		gobjHero.transform.position = playerPos;
-		
-		CameraControll camealControll = main_camera.GetComponent<CameraControll>();
-		camealControll.target = gobjHero.transform;
-		camealControll.Init();
-		
-		hero = gobjHero.GetComponent<Hero>();
-		
-		initFinish = true;
-		
-		yield return 1;
+	}
+	
+	public void GeneralShowTip(string txt){
+		GameObject gobjTip = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "tip");
+		UILabel txtTip = Tools.GetComponentInChildByPath<UILabel>(gobjTip, "txt");
+		txtTip.text = txt;
+		StartCoroutine(CoUITipTiming(gobjTip, 2f));
+	}
+	
+	IEnumerator CoUITipTiming(GameObject gobj, float dur){
+		yield return new WaitForSeconds(dur);
+		DestroyObject(gobj);
 	}
 }
