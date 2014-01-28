@@ -1,8 +1,9 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using SimpleJSON;
 
 public enum EGameState{
 	Running,
@@ -48,6 +49,7 @@ public class GameView : MonoBehaviour
 	
 	void Start ()
 	{
+		GameManager.GameModel = EGameModel.Play;
 		// init hero
 		StartCoroutine(InitWorld());
 	}
@@ -57,7 +59,7 @@ public class GameView : MonoBehaviour
 	{
 		// keyboard controll
 		/// for test.when build， close it
-		#if UNITY_EDITOR||UNITY_STANDALONE_WIN
+		#if UNITY_EDITOR||UNITY_STANDALONE_WIN||UNITY_WEBPLAYER
 		if(Input.GetKey(KeyCode.A)){
 			VCInput_Axis = -1;
 		}else if(Input.GetKey(KeyCode.D)){
@@ -209,8 +211,6 @@ public class GameView : MonoBehaviour
 				float localZ = float.Parse(posVals[3]);
 				GameObject cube = Tools.LoadResourcesGameObject(IPath.BuildItems + itemName);
 				
-				print(itemName);//#########
-				
 				cube.transform.parent = cubeParent.transform;
 				Vector3 locPos = new Vector3(localX, localY, localZ);
 				cube.transform.localPosition = locPos;
@@ -240,6 +240,12 @@ public class GameView : MonoBehaviour
 		}
 	}
 	
+	public void GeneralShowTipWithoutTime(string txt){
+		GameObject gobjTip = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "tip");
+		UILabel txtTip = Tools.GetComponentInChildByPath<UILabel>(gobjTip, "txt");
+		txtTip.text = txt;
+	}
+	
 	public void GeneralShowTip(string txt){
 		GameObject gobjTip = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "tip");
 		UILabel txtTip = Tools.GetComponentInChildByPath<UILabel>(gobjTip, "txt");
@@ -250,5 +256,27 @@ public class GameView : MonoBehaviour
 	IEnumerator CoUITipTiming(GameObject gobj, float dur){
 		yield return new WaitForSeconds(dur);
 		DestroyObject(gobj);
+	}
+	
+	public void PassOthers(){
+		if(GameManager.CurPlayerId != GameManager.CurTargetid){
+			StartCoroutine(CoRequestPass());
+		}
+	}
+	
+	IEnumerator CoRequestPass(){
+		WWW myWWW = new WWW("http://" + GameManager.ServerIP +  "/cwserver/passothers.php?playerid=" + GameManager.CurPlayerId + "&targetid=" + GameManager.CurTargetid + "&version=" + GameManager.CurVersion);
+		
+		yield return myWWW;
+		
+		string strRes = myWWW.text;
+		
+		JSONNode jd = JSONNode.Parse(strRes);
+		int state = jd["state"].AsInt;
+		if(state == 0){
+			GeneralShowTip("挑战成功！获得了徽章《" + GameManager.CurPlayerName + "/V" + GameManager.CurVersion + "》");
+		}else{
+			GeneralShowTip("服务器错误");
+		}
 	}
 }

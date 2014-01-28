@@ -136,6 +136,8 @@ public class HeroActorState_Idle : IActorState{
 			result = new HeroActorState_OnAir_Down(actor);
 		}else if(action == EFSMAction.HERO_ONAIR_UP){
 			result = new HeroActorState_OnAir_Up(actor);
+		}else if(action == EFSMAction.HERO_DIE){
+			result = new HeroActorState_Die(actor);
 		}
 		return result;
 	}
@@ -166,6 +168,9 @@ public class HeroActorState_OnAir_Up : IActorState{
 		else if(action == EFSMAction.HERO_ONAIR_UP){
 			result = new HeroActorState_OnAir_Up(actor);
 		}
+		else if(action == EFSMAction.HERO_DIE){
+			result = new HeroActorState_Die(actor);
+		}
 		return result;
 	}
 	
@@ -194,6 +199,8 @@ public class HeroActorState_Run : IActorState{
 			result = new HeroActorState_OnAir_Up(actor);
 		}else if(action == EFSMAction.HERO_ONAIR_DOWN){
 			result = new HeroActorState_OnAir_Down(actor);
+		}else if(action == EFSMAction.HERO_DIE){
+			result = new HeroActorState_Die(actor);
 		}
 		return result;
 	}
@@ -223,6 +230,11 @@ public class HeroActorState_OnAir_Down : IActorState{
 		else if(action == EFSMAction.HERO_ONAIR_UP){
 			result = new HeroActorState_OnAir_Up(actor);
 		}
+		
+		else if(action == EFSMAction.HERO_DIE){
+			result = new HeroActorState_Die(actor);
+		}
+		
 		return result;
 	}
 	
@@ -236,83 +248,24 @@ public class HeroActorState_OnAir_Down : IActorState{
 		actor.OnEnterOnAirDown();
 	}
 }
-//
-//public class HeroActorState_UnAttack : IActorState{
-//	public HeroActorState_UnAttack(IActor actor){
-//		this.actor = actor;
-//	}
-//	
-//	public override IActorState toNextState (EFSMAction action)
-//	{
-//		IActorState result = null;
-//		if(action == EFSMAction.HERO_IDLE){
-//			result = new HeroActorState_Idle(actor);
-//		}
-//		return result;
-//	}
-//	
-//	public override void OnEnter ()
-//	{
-//		actor.OnEnterUnAttack();
-//	}
-//}
-//
-//public class HeroActorState_Flash_Attack : IActorState{
-//	public HeroActorState_Flash_Attack(IActor actor){
-//		this.actor = actor;
-//	}
-//	
-//	public override IActorState toNextState (EFSMAction action)
-//	{
-//		IActorState result = null;
-//		if(action == EFSMAction.HERO_IDLE){
-//			result = new HeroActorState_Idle(actor);
-//		}
-//		return result;
-//	}
-//	
-//	public override void OnEnter ()
-//	{
-//		actor.OnEnterHeroFlashAttack();
-//	}
-//}
-//
-//public class ActorState_UnAttack : IActorState{
-//	public ActorState_UnAttack(IActor actor){
-//		this.actor = actor;
-//	}
-//	
-//	public override IActorState toNextState (EFSMAction action)
-//	{
-//		IActorState result = null;
-//		if(action == EFSMAction.IDLE){
-//			result = new ActorState_Idle(actor);
-//		}
-//		return result;
-//	}
-//	
-//	public override void OnEnter ()
-//	{
-//		actor.OnEnterUnAttack();
-//	}
-//}
-//
-//public class ActorState_UnAttack_By_Flash : IActorState{
-//	public ActorState_UnAttack_By_Flash(IActor actor){
-//		this.actor = actor;
-//	}
-//	
-//	public override IActorState toNextState (EFSMAction action)
-//	{
-//		IActorState result = null;
-//		if(action == EFSMAction.IDLE){
-//			result = new ActorState_Idle(actor);
-//		}
-//		return result;
-//	}
-//	
-//	public override void OnEnter ()
-//	{
-//		actor.OnEnterUnAttack_By_Flash();
-//	}
-//}
+
+public class HeroActorState_Die : IActorState{
+	public HeroActorState_Die(IActor actor){
+		this.actor = actor;
+	}
+	
+	public override IActorState toNextState (EFSMAction action)
+	{
+		return null;
+	}
+	
+	public override void DoUpdata ()
+	{
+		actor.DoUpdateDie();
+	}
+	
+	public override void OnEnter ()
+	{
+		actor.OnEnterDie();
+	}
+}

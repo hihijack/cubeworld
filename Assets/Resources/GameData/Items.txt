@@ -13,5 +13,20 @@
     "id": 3,
     "name": "宝箱",
     "resources_name": "chest"
+  },
+  {
+    "id": 4,
+    "name": "尖刺陷阱",
+    "resources_name": "spiketrap"
+  },
+  {
+    "id": 5,
+    "name": "升降台",
+    "resources_name": "platfromupdown"
+  } ,
+  {
+    "id": 6,
+    "name": "落石陷阱",
+    "resources_name": "stonetrap"
   }
 ]

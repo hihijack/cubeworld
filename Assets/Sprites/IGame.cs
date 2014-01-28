@@ -29,7 +29,8 @@ public enum EFSMAction {
 	HERO_IDLE,
 	HERO_RUN,
 	HERO_ONAIR_DOWN,
-	HERO_ONAIR_UP
+	HERO_ONAIR_UP,
+	HERO_DIE
 }
 
 public enum ERuneStoneType{
@@ -52,4 +53,9 @@ public class BuildItem{
 		name = jd["name"];
 		resourceName = jd["resources_name"];
 	}
+}
+
+public class PlayerInfo{
+	public int id;
+	public string name;
 }

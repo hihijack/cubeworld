@@ -392,30 +392,31 @@ namespace SimpleJSON
 		#if USE_SharpZipLib
 		public void SaveToCompressedStream(System.IO.Stream aData)
 		{
-			using (var gzipOut = new ICSharpCode.SharpZipLib.BZip2.BZip2OutputStream(aData))
-			{
-				gzipOut.IsStreamOwner = false;
-				SaveToStream(gzipOut);
-				gzipOut.Close();
-			}
+//			using (var gzipOut = new ICSharpCode.SharpZipLib.BZip2.BZip2OutputStream(aData))
+//			{
+//				gzipOut.IsStreamOwner = false;
+//				SaveToStream(gzipOut);
+//				gzipOut.Close();
+//			}
 		}
 
 		public void SaveToCompressedFile(string aFileName)
 		{
-			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
-			using(var F = System.IO.File.OpenWrite(aFileName))
-			{
-				SaveToCompressedStream(F);
-			}
+//			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
+//			using(var F = System.IO.File.OpenWrite(aFileName))
+//			{
+//				SaveToCompressedStream(F);
+//			}
 		}
 		public string SaveToCompressedBase64()
 		{
-			using (var stream = new System.IO.MemoryStream())
-			{
-				SaveToCompressedStream(stream);
-				stream.Position = 0;
-				return System.Convert.ToBase64String(stream.ToArray());
-			}
+//			using (var stream = new System.IO.MemoryStream())
+//			{
+//				SaveToCompressedStream(stream);
+//				stream.Position = 0;
+//				return System.Convert.ToBase64String(stream.ToArray());
+//			}
+			return "";
 		}
 
         #else
@@ -435,11 +436,11 @@ namespace SimpleJSON
 		
 		public void SaveToFile(string aFileName)
 		{
-			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
-			using(var F = System.IO.File.OpenWrite(aFileName))
-			{
-				SaveToStream(F);
-			}
+//			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
+//			using(var F = System.IO.File.OpenWrite(aFileName))
+//			{
+//				SaveToStream(F);
+//			}
 		}
 		public string SaveToBase64()
 		{

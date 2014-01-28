@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using SimpleJSON;
 
-public enum ESceneType{
+public enum EGameModel{
 	MainMenu,
 	Edit,
 	Play
@@ -17,6 +17,9 @@ public enum EPlayModel{
 }
 
 public static class GameManager{
+	public static string ServerIP = "172.18.10.13";
+//	public static string ServerIP = "localhost";
+	
 	public static int CurPlayerId;
 	public static string CurPlayerName;
 	public static string MyWorldDataCache;
@@ -39,4 +42,20 @@ public static class GameManager{
 	}
 	
 	public static bool IsVerify = false;
+
+	public static int CurTargetid = 0;
+	public static string CurTargetName = "";
+	public static int CurVersion = 0;
+	
+	public static bool HasLogin = false;
+	
+	public static EGameModel _gameModel;
+	public static EGameModel GameModel{
+		get{
+			return _gameModel;
+		}
+		set{
+			_gameModel = value;
+		}
+	}
 }

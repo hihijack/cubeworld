@@ -1,0 +1,111 @@
+fileFormatVersion: 2
+guid: b6f546c0a8f124e48a14fb4f20a48163
+ModelImporter:
+  serializedVersion: 15
+  fileIDToRecycleName:
+    100000: treasurechest
+    100002: treasurechest 1
+    100004: //RootNode
+    100006: treasurechest_bone_0
+    100008: treasurechest_bone_1
+    100010: treasurechest_bone_10
+    100012: treasurechest_bone_4
+    100014: treasurechest_bone_5
+    100016: treasurechest_bone_6
+    100018: treasurechest_bone_7
+    100020: treasurechest_bone_8
+    100022: treasurechest_bone_9
+    100024: treasurechest_bone_Breath
+    100026: treasurechest_bone_Name
+    400000: treasurechest
+    400002: treasurechest 1
+    400004: //RootNode
+    400006: treasurechest_bone_0
+    400008: treasurechest_bone_1
+    400010: treasurechest_bone_10
+    400012: treasurechest_bone_4
+    400014: treasurechest_bone_5
+    400016: treasurechest_bone_6
+    400018: treasurechest_bone_7
+    400020: treasurechest_bone_8
+    400022: treasurechest_bone_9
+    400024: treasurechest_bone_Breath
+    400026: treasurechest_bone_Name
+    4300000: treasurechest
+    7400000: Open
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: treasurechest
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 1
+    clipAnimations:
+    - name: Open
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 32
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      transformMask: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    handles: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  additionalBone: 1
+  animationType: 1
+  userData: 

@@ -23,6 +23,8 @@ public class CameraControll : MonoBehaviour
 	
 	public Camera cameraUI;
 	
+	Hero heroTarget;
+	
 	void LateUpdate ()
 	{
 		// Early out if we don't have a target
@@ -57,7 +59,7 @@ public class CameraControll : MonoBehaviour
 		transform.position -= aimRotation * Vector3.forward * distance;
 		transform.LookAt (target);
 		//人物转向
-		if (isRight) {
+		if (isRight && heroTarget!=null && !heroTarget.IsInState(typeof(HeroActorState_Die))) {
 			float aimHero = transform.eulerAngles.y;
 			target.eulerAngles = new Vector3 (0, aimHero, 0);	
 		}
@@ -84,5 +86,7 @@ public class CameraControll : MonoBehaviour
 		//初始欧拉角
 		angleH = transform.eulerAngles.y;
 		angleV = transform.eulerAngles.x;
+		
+		heroTarget = target.GetComponent<Hero>();
 	}
 }

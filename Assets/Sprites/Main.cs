@@ -15,7 +15,9 @@ public class Main : MonoBehaviour {
 
 	public GameObject cube;
 	public GameObject parent;
+	
 	public Camera camera;
+	public Camera cameraUI;
 	
 	public GameObject oriCube;
 	
@@ -45,12 +47,14 @@ public class Main : MonoBehaviour {
 		}
 	}
 	
-	int[] defaultBuildItemId = {1, 2, 3};
+	int[] defaultBuildItemId = {1, 2, 3, 4, 5, 6};
 	
 	int axisV = 0;
 	int axisH = 0;
 	
 	void Start () {
+		GameManager.GameModel = EGameModel.Edit;
+		
 		InitBuildItemUI();
 		
 		UISetVerifty();
@@ -72,6 +76,25 @@ public class Main : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+		#if UNITY_EDITOR||UNITY_STANDALONE_WIN||UNITY_WEBPLAYER
+		if(Input.GetKey(KeyCode.A)){
+			axisH = -1;
+		}else if(Input.GetKey(KeyCode.D)){
+			axisH = 1;
+		}else{
+			axisH = 0;
+		}
+		
+		if(Input.GetKey(KeyCode.W)){
+			axisV = 1;
+		}else if(Input.GetKey(KeyCode.S)){
+			axisV = -1;
+		}else{
+			axisV = 0;
+		}
+		#endif
+		
+		
 		camera.transform.Translate(axisH * cameraSpeed, axisV * cameraSpeed, 0);
 		
 		if(Input.GetMouseButtonDown(0)){
@@ -82,9 +105,8 @@ public class Main : MonoBehaviour {
 			Ray ray = camera.ScreenPointToRay(posMouse);
 			RaycastHit rh;
 			if(Physics.Raycast(ray, out rh)){
-				
-				GameObject gobjHit = rh.collider.gameObject;
-				if(gobjHit.layer != LayerMask.NameToLayer("UI")){
+				if(!Tools.IsTouchLayer(cameraUI, "UI")){
+					GameObject gobjHit = rh.collider.gameObject;
 					if(model == EModel.Create){
 						Vector3 normalHit = rh.normal;
 						Vector3 posNew = gobjHit.transform.position + normalHit;
@@ -133,7 +155,7 @@ public class Main : MonoBehaviour {
 	
 	void OnDrag(DragGesture gesture){
 		Vector3 move = gesture.DeltaMove * 0.3f;
-		camera.transform.Rotate(move.y, -1 * move.x, 0f);
+		camera.transform.Rotate(-1 * move.y, move.x, 0f);
 		Vector3 angle = camera.transform.eulerAngles;
 		angle.z = 0;
 		camera.transform.eulerAngles = angle;
@@ -163,7 +185,7 @@ public class Main : MonoBehaviour {
 //	}
 	
 	IEnumerator CoRequestWorldData(){
-		WWW myWWW = new WWW("http://localhost/cwserver/getworlddata.php?playerid=" + GameManager.CurPlayerId);
+		WWW myWWW = new WWW("http://" + GameManager.ServerIP +"/cwserver/getworlddata.php?playerid=" + GameManager.CurPlayerId);
 		yield return  myWWW;
 		
 		string strRes = myWWW.text;
@@ -272,10 +294,15 @@ public class Main : MonoBehaviour {
 		
 		StringBuilder strBuilder = new StringBuilder();
 		
+		bool hasChest = false;
+		
 		foreach (Transform tfCube in parent.transform) {
 			if(tfCube.CompareTag("PlayerPos")){
 				strPlayerPosData = tfCube.position.x + "," + tfCube.position.y + "," + tfCube.position.z;
 			}else{
+				if(tfCube.name.Equals("chest")){
+					hasChest = true;
+				}
 				string strData = tfCube.name + "," + tfCube.localPosition.x + "," + tfCube.localPosition.y + "," + tfCube.localPosition.z + "|";
 				strBuilder.Append(strData);	
 			}
@@ -284,16 +311,20 @@ public class Main : MonoBehaviour {
 		strCubesData = strBuilder.ToString();
 		
 		// 方块保存数据
-		if(!string.IsNullOrEmpty(strCubesData) && !string.IsNullOrEmpty(strPlayerPosData)){
-			string strData = strCubesData + "_" + strPlayerPosData;
-			StartCoroutine(CoRequestSaveCubeData(strData, toPlay));
+		if(!hasChest){
+			GeneralShowTip("必须至少创建一个宝箱");
 		}else{
-			GeneralShowTip("必须创建一个玩家初始位置");
+			if(!string.IsNullOrEmpty(strCubesData) && !string.IsNullOrEmpty(strPlayerPosData)){
+				string strData = strCubesData + "_" + strPlayerPosData;
+				StartCoroutine(CoRequestSaveCubeData(strData, toPlay));
+			}else{
+				GeneralShowTip("必须创建一个玩家初始位置");
+			}
 		}
 	}
 	
 	IEnumerator CoRequestSaveCubeData(string cubedata, bool toPlay){
-		WWW myWWW = new WWW("http://localhost/cwserver/saveworlddata.php?playerid=" + GameManager.CurPlayerId + "&" + "worlddata=" + cubedata);
+		WWW myWWW = new WWW("http://" + GameManager.ServerIP +"/cwserver/saveworlddata.php?playerid=" + GameManager.CurPlayerId + "&" + "worlddata=" + cubedata);
 		yield return  myWWW;
 		
 		string strRes = myWWW.text;

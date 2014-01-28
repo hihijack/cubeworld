@@ -76,7 +76,9 @@ public class Hero : IActor
 	public override void DoUpdateIdle ()
 	{
 		moveDir.y = -0.1f;
+		
 		cc.Move(moveDir);
+		
 		if(!cc.isGrounded){
 			updataState(new IActorAction(EFSMAction.HERO_ONAIR_DOWN));
 		}else{
@@ -142,6 +144,11 @@ public class Hero : IActor
 			updataState(new IActorAction(EFSMAction.HERO_IDLE));
 		}
 		
+		if(moveDir.y <= -30f){
+			// 掉落死亡
+			updataState(new IActorAction(EFSMAction.HERO_DIE));
+		}
+		
 //		if(canSecondJump && btnA > 0){
 //			updataState(new IActorAction(EFSMAction.HERO_ONAIR_UP));
 //		}
@@ -179,6 +186,17 @@ public class Hero : IActor
 //		}
 	}
 
+	public override void OnEnterDie ()
+	{
+		PlayAnim("Death");
+		gameView.GeneralShowTipWithoutTime("你挂了");
+	}
+	
+	public override void DoUpdateDie ()
+	{
+		
+	}
+	
 	
 	public bool IsHitSomeThing(){
 		return false;
@@ -231,6 +249,11 @@ public class Hero : IActor
 	void OnTriggerExit(Collider other){
 		if(other.CompareTag("Interactive")){
 			CurInteract = null;
+		}else if(other.CompareTag("Trigger")){
+			ITrigger it = other.GetComponent<ITrigger>();
+			if(it != null){
+				it.OnTriggerExit(gameObject);
+			}
 		}
 	}
 	

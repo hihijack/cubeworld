@@ -1,0 +1,97 @@
+fileFormatVersion: 2
+guid: 43795c775e746784092a077e0a562d4d
+ModelImporter:
+  serializedVersion: 15
+  fileIDToRecycleName:
+    100000: spiketrap
+    100002: //RootNode
+    100004: spiketrap 1
+    100006: spiketrap_bone_0
+    100008: spiketrap_bone_1
+    100010: spiketrap_bone_10
+    100012: spiketrap_bone_11
+    100014: spiketrap_bone_12
+    100016: spiketrap_bone_13
+    100018: spiketrap_bone_14
+    100020: spiketrap_bone_2
+    100022: spiketrap_bone_3
+    100024: spiketrap_bone_4
+    100026: spiketrap_bone_5
+    100028: spiketrap_bone_6
+    100030: spiketrap_bone_7
+    100032: spiketrap_bone_8
+    100034: spiketrap_bone_9
+    400000: //RootNode
+    400002: spiketrap
+    400004: spiketrap 1
+    400006: spiketrap_bone_0
+    400008: spiketrap_bone_1
+    400010: spiketrap_bone_10
+    400012: spiketrap_bone_11
+    400014: spiketrap_bone_12
+    400016: spiketrap_bone_13
+    400018: spiketrap_bone_14
+    400020: spiketrap_bone_2
+    400022: spiketrap_bone_3
+    400024: spiketrap_bone_4
+    400026: spiketrap_bone_5
+    400028: spiketrap_bone_6
+    400030: spiketrap_bone_7
+    400032: spiketrap_bone_8
+    400034: spiketrap_bone_9
+    4300000: spiketrap
+    7400000: Stand
+    9500000: //RootNode
+    13700000: spiketrap
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .0199999996
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    handles: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  additionalBone: 1
+  animationType: 2
+  userData: 
