@@ -14,8 +14,8 @@ public enum EGameState{
 public class GameView : MonoBehaviour
 {
 	
-	public int VCInput_Axis;
-	public int VCInput_Ver_Axis;
+	public float VCInput_Axis;
+	public float VCInput_Ver_Axis;
 	private int _vcInputBtnA;
 	public int VCInputBtnA{
 		get{
@@ -47,6 +47,8 @@ public class GameView : MonoBehaviour
 	
 	public GameObject g_GobjPlane;
 	
+	GameObject gGobjKeyTip;// 按键提升
+	
 	void Start ()
 	{
 		GameManager.GameModel = EGameModel.Play;
@@ -60,21 +62,24 @@ public class GameView : MonoBehaviour
 		// keyboard controll
 		/// for test.when build， close it
 		#if UNITY_EDITOR||UNITY_STANDALONE_WIN||UNITY_WEBPLAYER
-		if(Input.GetKey(KeyCode.A)){
-			VCInput_Axis = -1;
-		}else if(Input.GetKey(KeyCode.D)){
-			VCInput_Axis = 1;
-		}else{
-			VCInput_Axis = 0;
-		}
+//		if(Input.GetKey(KeyCode.A)){
+//			VCInput_Axis = -1;
+//		}else if(Input.GetKey(KeyCode.D)){
+//			VCInput_Axis = 1;
+//		}else{
+//			VCInput_Axis = 0;
+//		}
+//		
+//		if(Input.GetKey(KeyCode.W)){
+//			VCInput_Ver_Axis = 1;
+//		}else if(Input.GetKey(KeyCode.S)){
+//			VCInput_Ver_Axis = -1;
+//		}else{
+//			VCInput_Ver_Axis = 0;
+//		}
 		
-		if(Input.GetKey(KeyCode.W)){
-			VCInput_Ver_Axis = 1;
-		}else if(Input.GetKey(KeyCode.S)){
-			VCInput_Ver_Axis = -1;
-		}else{
-			VCInput_Ver_Axis = 0;
-		}
+		VCInput_Axis = Input.GetAxis("Horizontal");
+		VCInput_Ver_Axis = Input.GetAxis("Vertical");
 		
 		if(Input.GetKeyDown(KeyCode.Space)){
 			VCInputBtnA = 1;
@@ -86,6 +91,11 @@ public class GameView : MonoBehaviour
 			VCInputBtnB  = 1;
 		}else{
 			VCInputBtnB = 0;
+		}
+		
+		if(Input.GetKeyDown(KeyCode.R)){
+			CameraControll camealControll = main_camera.GetComponent<CameraControll>();
+			camealControll.ToggleFAP();
 		}
 		#endif
 		if(hero != null){
@@ -159,6 +169,10 @@ public class GameView : MonoBehaviour
 				}
 			}
 		}
+		
+		if("btn_restart".Equals(btnname)){
+			Application.LoadLevel("Play");
+		}
 	}
 	
 	void BackToCreate(){
@@ -187,6 +201,17 @@ public class GameView : MonoBehaviour
 //		main_camera.transform.eulerAngles = cameraAngle;
 	}
 	
+	
+	public void ShowKeyTip(){
+		gGobjKeyTip = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "ui_tip");
+	}
+	
+	public void HideKeyTip(){
+		if(gGobjKeyTip != null){
+			DestroyObject(gGobjKeyTip);
+		}
+	}
+	
 	IEnumerator InitWorld(){
 		string worldData = "";
 		if(GameManager.PlayModel == EPlayModel.Mine && !string.IsNullOrEmpty(GameManager.MyWorldDataCache)){
@@ -194,11 +219,28 @@ public class GameView : MonoBehaviour
 		}else if(GameManager.PlayModel == EPlayModel.Others && !string.IsNullOrEmpty(GameManager.OtherWorldDataCache)){
 			worldData = GameManager.OtherWorldDataCache;
 		}
+		
 		if(!string.IsNullOrEmpty(worldData)){
+			
+			GameObject gobjUILoading = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "ui_loading");
+			UILabel txt = Tools.GetComponentInChildByPath<UILabel>(gobjUILoading, "txt");
+			UIProgressBar upb = Tools.GetComponentInChildByPath<UIProgressBar>(gobjUILoading, "pb");
+			
 			string[] strsData = worldData.Split('_');
 			string strCubesData = strsData[0];
 			string[] strCubes = strCubesData.Split('|');
+			
+			int allCount = strCubes.Length + 1;
+			int curCount = 0;
+			
 			foreach (string item in strCubes) {
+				
+				// 载入进度
+				curCount ++;
+				float persent = (float)curCount / allCount;
+				upb.value = persent;
+				persent *= 100;
+				txt.text = persent.ToString("0.0") + "%";
 				
 				if(string.IsNullOrEmpty(item)){
 					continue;
@@ -237,6 +279,8 @@ public class GameView : MonoBehaviour
 			initFinish = true;
 			
 			yield return 1;
+			
+			DestroyObject(gobjUILoading);
 		}
 	}
 	

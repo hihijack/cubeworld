@@ -8,9 +8,4 @@ public class Dangerous : ITrigger {
 		Hero hero = gobjTarget.GetComponent<Hero>();
 		hero.updataState(new IActorAction(EFSMAction.HERO_DIE));
 	}
-	
-	public override void OnTriggerExit (GameObject gobjTarget)
-	{
-		
-	}
 }

@@ -21,8 +21,8 @@ public class Hero : IActor
 	
 	GameView gameView;
 	
-	int axisH = 0;
-	int axisV = 0;
+	float axisH = 0;
+	float axisV = 0;
 	int btnA = 0;
 	int btnB = 0;
 	
@@ -39,8 +39,27 @@ public class Hero : IActor
 		set{
 			print("set" + value);//######
 			_curInteract = value;
+			if(value != null){
+				// 按键提示
+				gameView.ShowKeyTip();
+			}else{
+				gameView.HideKeyTip();
+			}
 		}
 	}
+	
+	
+	bool superJump = false;
+	public bool SuperJump{
+		get{
+			return superJump;
+		}
+		set{
+			superJump = value;
+		}
+	}
+	
+//============================================================================================================	
 	
 	void Start(){
 		isEnermy = false;
@@ -157,6 +176,9 @@ public class Hero : IActor
 	public override void OnEnterOnAirUp ()
 	{
 		float jumpSpeedTemp = jumpSpeed;
+		if(SuperJump){
+			jumpSpeedTemp *= 3;
+		}
 		
 		moveDir.y = jumpSpeedTemp;
 		
@@ -252,7 +274,7 @@ public class Hero : IActor
 		}else if(other.CompareTag("Trigger")){
 			ITrigger it = other.GetComponent<ITrigger>();
 			if(it != null){
-				it.OnTriggerExit(gameObject);
+				it.OnExitTrigger(gameObject);
 			}
 		}
 	}

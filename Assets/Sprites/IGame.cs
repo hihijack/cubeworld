@@ -43,15 +43,22 @@ public enum EActorType{
 	Hero
 }
 
+public enum EBuildItemType{
+	Base,
+	Active
+}
+
 public class BuildItem{
 	public int id;
 	public string name;
 	public string resourceName;
+	public EBuildItemType type;
 	
 	public BuildItem(JSONNode jd){
 		id = jd["id"].AsInt;
 		name = jd["name"];
 		resourceName = jd["resources_name"];
+		type = (EBuildItemType)jd["type"].AsInt;
 	}
 }
 

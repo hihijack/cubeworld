@@ -2,31 +2,49 @@
   {
     "id": 1,
     "name": "方块",
-    "resources_name": "cube"
+    "resources_name": "cube",
+    "type":0
   },
   {
     "id": 2,
     "name": "玩家",
-    "resources_name": "player"
+    "resources_name": "player",
+    "type":0
   },
     {
     "id": 3,
     "name": "宝箱",
-    "resources_name": "chest"
+    "resources_name": "chest",
+    "type":0
   },
   {
     "id": 4,
     "name": "尖刺陷阱",
-    "resources_name": "spiketrap"
+    "resources_name": "spiketrap",
+    "type":1
   },
   {
     "id": 5,
     "name": "升降台",
-    "resources_name": "platfromupdown"
+    "resources_name": "platfromupdown",
+    "type":1
   } ,
   {
     "id": 6,
     "name": "落石陷阱",
-    "resources_name": "stonetrap"
+    "resources_name": "stonetrap",
+    "type":1
+  },
+  {
+    "id": 7,
+    "name": "跳跃板",
+    "resources_name": "superjump",
+    "type":1
+  },
+  {
+    "id": 8,
+    "name": "破裂的方块",
+    "resources_name": "brokencube",
+    "type":1
   }
 ]

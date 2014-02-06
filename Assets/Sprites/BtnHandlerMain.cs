@@ -10,6 +10,6 @@ public class BtnHandlerMain : MonoBehaviour {
 	}
 	
 	void OnPress(bool isDown){
-		gameView.OnBtnPress(gameObject.name, isDown);
+		gameView.OnBtnPress(gameObject, isDown);
 	}
 }

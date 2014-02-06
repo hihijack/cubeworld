@@ -158,7 +158,7 @@ ModelImporter:
     - name: JumpStart
       takeName: Take 001
       firstFrame: 0
-      lastFrame: 23.7999992
+      lastFrame: 21.1000004
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

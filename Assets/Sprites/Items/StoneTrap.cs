@@ -11,11 +11,6 @@ public class StoneTrap : ITrigger {
 		iTween.MoveTo(gobjStone, iTween.Hash("y", 0f, "time", 1f, "islocal", true, "easetype", "easeInOutQuad", "oncomplete", "OnAnimEnd", "oncompletetarget", gameObject));
 	}
 	
-	public override void OnTriggerExit (GameObject gobjTarget)
-	{
-		
-	}
-	
 	void OnAnimEnd(){
 		gobjStone.transform.parent = null;
 		DestroyObject(gameObject);

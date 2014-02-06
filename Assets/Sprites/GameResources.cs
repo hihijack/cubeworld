@@ -30,4 +30,8 @@ public static class GameResources{
 			AddBuildItemBD(buildItem);
 		}
 	}
+	
+	public static int GetLengthBaseBuildItem(){
+		return dicItems.Count;
+	}
 }

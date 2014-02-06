@@ -17,7 +17,7 @@ public class PlatformUpDown : ITrigger {
 		gobjTarget.transform.parent = transform;
 	}
 	
-	public override void OnTriggerExit (GameObject gobjTarget)
+	public override void OnExitTrigger (GameObject gobjTarget)
 	{
 		gobjTarget.transform.parent = null;
 	}

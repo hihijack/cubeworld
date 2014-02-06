@@ -36,6 +36,8 @@ public class Main : MonoBehaviour {
 	
 	Vector3 touchPosFirst;
 	
+	public GameObject g_UI_Items;
+	
 	BuildItem _curBuildItem;
 	BuildItem CurBuildItem{
 		set{
@@ -154,11 +156,13 @@ public class Main : MonoBehaviour {
 	}
 	
 	void OnDrag(DragGesture gesture){
-		Vector3 move = gesture.DeltaMove * 0.3f;
-		camera.transform.Rotate(-1 * move.y, move.x, 0f);
-		Vector3 angle = camera.transform.eulerAngles;
-		angle.z = 0;
-		camera.transform.eulerAngles = angle;
+		if(!HasUI()){
+			Vector3 move = gesture.DeltaMove * 0.3f;
+			camera.transform.Rotate(-1 * move.y, move.x, 0f);
+			Vector3 angle = camera.transform.eulerAngles;
+			angle.z = 0;
+			camera.transform.eulerAngles = angle;
+		}
 //		if(model == EModel.Move){
 //			Vector3 move = gesture.DeltaMove * 0.05f;
 //			camera.transform.Translate(move, Space.World);
@@ -168,8 +172,14 @@ public class Main : MonoBehaviour {
 	}
 	
 	void OnPinch(PinchGesture gesture){
-		float delta = gesture.Delta;
-		camera.transform.Translate(0f, 0f, delta * 0.05f);
+		if(!HasUI()){
+			float delta = gesture.Delta;
+			camera.transform.Translate(0f, 0f, delta * 0.05f);
+		}
+	}
+	
+	bool HasUI(){
+		return g_UI_Items.activeSelf;
 	}
 	
 	void OnBtnPlay(){
@@ -200,8 +210,10 @@ public class Main : MonoBehaviour {
 			
 			GameManager.IsVerify = verify > 0 ? true : false;
 			
-			GameManager.MyWorldDataCache = strWorlddata;
-			StartCoroutine(CoInitWorld(strWorlddata));
+			if(!string.IsNullOrEmpty(strWorlddata) && !strWorlddata.Equals("null")){
+				GameManager.MyWorldDataCache = strWorlddata;
+				StartCoroutine(CoInitWorld(strWorlddata));
+			}
 		}
 		
 		UISetVerifty();
@@ -235,6 +247,10 @@ public class Main : MonoBehaviour {
 		
 		string strCubesData = strsData[0];
 		
+		GameObject gobjUILoading = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "ui_loading");
+		UILabel txt = Tools.GetComponentInChildByPath<UILabel>(gobjUILoading, "txt");
+		UIProgressBar upb = Tools.GetComponentInChildByPath<UIProgressBar>(gobjUILoading, "pb");
+		
 		if(!string.IsNullOrEmpty(strCubesData)){
 			// 删除已有，除了原方块
 			foreach (Transform tfCube in parent.transform) {
@@ -246,7 +262,18 @@ public class Main : MonoBehaviour {
 			
 			// 加载子物体，除了原方块（位置为000）
 			string[] strCubes = strCubesData.Split('|');
+			
+			int allCount = strCubes.Length + 1;
+			int curCount = 0;
+			
 			foreach (string item in strCubes) {
+				
+				// 载入进度
+				curCount ++;
+				float persent = (float)curCount / allCount;
+				upb.value = persent;
+				persent *= 100;
+				txt.text = persent.ToString("0.0") + "%";
 				
 				if(string.IsNullOrEmpty(item)){
 					continue;
@@ -283,6 +310,8 @@ public class Main : MonoBehaviour {
 			cube.transform.localEulerAngles = Vector3.zero;
 			yield return 1;
 		}
+		
+		DestroyObject(gobjUILoading);
 	}
 	
 	void Save(bool toPlay){
@@ -370,9 +399,34 @@ public class Main : MonoBehaviour {
 				}
 			}
 		}
+		
+		// 列表初始化
+		GameObject gobjGridBase = Tools.GetGameObjectInChildByPathSimple(g_GobjBtns, "ui_items/items_base/listview/grid");
+		UIGrid gridBase = gobjGridBase.GetComponent<UIGrid>();
+		GameObject gobjGridActive = Tools.GetGameObjectInChildByPathSimple(g_GobjBtns, "ui_items/items_active/listview/grid");
+		UIGrid gridActive = gobjGridActive.GetComponent<UIGrid>();
+		foreach (BuildItem item in GameResources.dicItems.Values) {
+			GameObject gobjparent = null;
+			if(item.type == EBuildItemType.Base){
+				gobjparent = gobjGridBase;
+			}else if(item.type == EBuildItemType.Active){
+				gobjparent = gobjGridActive;
+			}
+			
+			if(gobjparent != null){
+				GameObject gobjItem = Tools.AddNGUIChild(gobjparent, IPath.UI + "ui_builditem");
+				UISprite us = Tools.GetComponentInChildByPath<UISprite>(gobjItem, "icon");
+				us.spriteName = "icon_" + item.resourceName;
+				DataCache dc = gobjItem.AddComponent<DataCache>();
+				dc.data = item;
+			}
+		}
+		gridBase.Reposition();
+		gridActive.Reposition();
 	}
 	
-	public void OnBtnPress(string btnname, bool isDown){
+	public void OnBtnPress(GameObject gobjBtn, bool isDown){
+		string btnname = gobjBtn.name;
 		if("btn_down".Equals(btnname)){
 			if(isDown){
 				axisV = -1;
@@ -399,6 +453,22 @@ public class Main : MonoBehaviour {
 				axisH = 1;
 			}else{
 				axisH = 0;
+			}
+		}
+		
+		if(btnname.Contains("ui_builditem")){
+			DataCache dc = gobjBtn.GetComponent<DataCache>();
+			BuildItem bi = dc.data as BuildItem;
+			
+			UIToggle toggleCur = UIToggle.GetActiveToggle(1);
+			DataCache dcTemp = toggleCur.GetComponent<DataCache>();
+			if(dcTemp != null){
+				BuildItem biTemp = dcTemp.data as BuildItem;
+				
+				CurBuildItem = bi;
+				dcTemp.data = bi;
+				UISprite usIcon = Tools.GetComponentInChildByPath<UISprite>(toggleCur.gameObject, "icon");
+				usIcon.spriteName = "icon_" + bi.resourceName;
 			}
 		}
 	}

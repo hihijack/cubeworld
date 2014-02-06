@@ -42,7 +42,11 @@ public class GameViewLogin : MonoBehaviour {
 	
 	void OnGUI(){
 		GUI.Label(new Rect(50f, 50f, 300f, 300f), "V0.3");
-//		GUI.Label(new Rect(50f, 400f, 300f, 300f), strDebug);
+		
+		if(GameManager.debug){
+			GUI.Label(new Rect(50f, 400f, 300f, 600f), strDebug);
+		}
+	
 	}
 	
 	void GetLocalSavedPlayerId(){
@@ -209,7 +213,15 @@ public class GameViewLogin : MonoBehaviour {
 		
 		string strRes = "";
 		
+		if(GameManager.debug){
+			strDebug += "aaaaa";
+		}
+		
 		strRes = myWWW.text;
+		
+		if(GameManager.debug){
+			strDebug += strRes;
+		}
 		
 		print("Response:" + strRes);//##########
 		

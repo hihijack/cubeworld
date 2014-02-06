@@ -30,38 +30,63 @@ public class CameraControll : MonoBehaviour
 		// Early out if we don't have a target
 		if (!target)
 			return;
-			
-		bool isRight = false;
 		
-		//镜头控制
-		if (Input.GetMouseButton (0) || Input.GetMouseButton(1)) {
-			string touchLayerName = Tools.GetTouchLayer(cameraUI);
-			
-			if(!touchLayerName.Contains("UI")){
-				angleH += Mathf.Clamp (Input.GetAxis ("Mouse X"), -1, 1) * horizontalAimingSpeed * Time.deltaTime;
-				angleV -= Mathf.Clamp (Input.GetAxis ("Mouse Y"), -1, 1) * verticalAimingSpeed * Time.deltaTime;		
-				if(Input.GetMouseButton (0)){
-					isRight = true;
+		if(isFAP){
+			//镜头控制
+			if (Input.GetMouseButton (0) || Input.GetMouseButton(1)) {
+				string touchLayerName = Tools.GetTouchLayer(cameraUI);
+				
+				if(!touchLayerName.Contains("UI")){
+					angleH += Mathf.Clamp (Input.GetAxis ("Mouse X"), -1, 1) * horizontalAimingSpeed * Time.deltaTime;
+					angleV -= Mathf.Clamp (Input.GetAxis ("Mouse Y"), -1, 1) * verticalAimingSpeed * Time.deltaTime;		
 				}
 			}
-		}
-		//滚轮
-		if (Input.GetAxis ("Mouse ScrollWheel") != 0) {
-			if (Input.GetAxis ("Mouse ScrollWheel") < 0 || distance > 2) {
-				distance -= Input.GetAxis ("Mouse ScrollWheel") * rollSpeed * Time.deltaTime;   
+			
+			Vector3 pos = target.position;
+			pos.y += 0.77f;
+			transform.position = pos;
+			
+			Quaternion aimRotation = Quaternion.Euler (angleV, angleH, 0);
+			transform.rotation = aimRotation;
+			//人物转向
+			if (heroTarget!=null && !heroTarget.IsInState(typeof(HeroActorState_Die))) {
+				float aimHero = transform.eulerAngles.y;
+				target.eulerAngles = new Vector3 (0, aimHero, 0);	
 			}
-			if (distance < 2) {
-				distance = 2;
+		}else{
+		
+			bool isRight = false;
+			
+			//镜头控制
+			if (Input.GetMouseButton (0) || Input.GetMouseButton(1)) {
+				string touchLayerName = Tools.GetTouchLayer(cameraUI);
+				
+				if(!touchLayerName.Contains("UI")){
+					angleH += Mathf.Clamp (Input.GetAxis ("Mouse X"), -1, 1) * horizontalAimingSpeed * Time.deltaTime;
+					angleV -= Mathf.Clamp (Input.GetAxis ("Mouse Y"), -1, 1) * verticalAimingSpeed * Time.deltaTime;		
+					if(Input.GetMouseButton (0)){
+						isRight = true;
+					}
+				}
 			}
-		}
-		Quaternion aimRotation = Quaternion.Euler (angleV, angleH, 0);
-		transform.position = target.position;
-		transform.position -= aimRotation * Vector3.forward * distance;
-		transform.LookAt (target);
-		//人物转向
-		if (isRight && heroTarget!=null && !heroTarget.IsInState(typeof(HeroActorState_Die))) {
-			float aimHero = transform.eulerAngles.y;
-			target.eulerAngles = new Vector3 (0, aimHero, 0);	
+			//滚轮
+			if (Input.GetAxis ("Mouse ScrollWheel") != 0) {
+				if (Input.GetAxis ("Mouse ScrollWheel") < 0 || distance > 2) {
+					distance -= Input.GetAxis ("Mouse ScrollWheel") * rollSpeed * Time.deltaTime;   
+				}
+				if (distance < 2) {
+					distance = 2;
+				}
+			}
+			Quaternion aimRotation = Quaternion.Euler (angleV, angleH, 0);
+			transform.position = target.position;
+			transform.position -= aimRotation * Vector3.forward * distance;
+			transform.LookAt (target);
+			//人物转向
+			if (isRight && heroTarget!=null && !heroTarget.IsInState(typeof(HeroActorState_Die))) {
+				float aimHero = transform.eulerAngles.y;
+				target.eulerAngles = new Vector3 (0, aimHero, 0);	
+			}
 		}
 	}
 
@@ -72,21 +97,52 @@ public class CameraControll : MonoBehaviour
 	
 	public void Init ()
 	{
-		Vector3 pos = target.position;
-		pos -= target.rotation * Vector3.forward * distance;
-		pos.y = target.position.y + height;
-		transform.position = pos;
-		
-		// Always look at the target
-		transform.LookAt (target);
-		
-		Quaternion rot = target.rotation;
-		rot.y = transform.rotation.y;
-		target.rotation = rot;
-		//初始欧拉角
-		angleH = transform.eulerAngles.y;
-		angleV = transform.eulerAngles.x;
-		
-		heroTarget = target.GetComponent<Hero>();
+		if(isFAP){
+			Vector3 pos = target.position;
+			pos.y += 0.77f;
+			transform.position = pos;
+			Quaternion rot = target.rotation;
+			rot.y = transform.rotation.y;
+			target.rotation = rot;
+			//初始欧拉角
+			angleH = transform.eulerAngles.y;
+			angleV = transform.eulerAngles.x;
+			
+			heroTarget = target.GetComponent<Hero>();
+			// 隐藏人物模型
+			GameObject gobjModel = Tools.GetGameObjectInChildByPathSimple(target.gameObject, "model");
+			gobjModel.SetActive(false);
+		}else{
+			Vector3 pos = target.position;
+			pos -= target.rotation * Vector3.forward * distance;
+			pos.y = target.position.y + height;
+			transform.position = pos;
+			
+			// Always look at the target
+			transform.LookAt (target);
+			
+			Quaternion rot = target.rotation;
+			rot.y = transform.rotation.y;
+			target.rotation = rot;
+			//初始欧拉角
+			angleH = transform.eulerAngles.y;
+			angleV = transform.eulerAngles.x;
+			
+			heroTarget = target.GetComponent<Hero>();
+			// 显示人物模型
+			GameObject gobjModel = Tools.GetGameObjectInChildByPathSimple(target.gameObject, "model");
+			gobjModel.SetActive(true);
+		}
+	}
+	
+	// 切换第一视角
+	public void ToggleFAP(){
+		if(isFAP){
+			isFAP = false;
+			Init();
+		}else{
+			isFAP = true;
+			Init();
+		}
 	}
 }
