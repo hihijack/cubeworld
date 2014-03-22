@@ -18,8 +18,8 @@ public enum EPlayModel{
 
 public static class GameManager{
 //	public static string ServerIP = "172.18.10.13";
-//	public static string ServerIP = "localhost";
-	public static string ServerIP = "hihijack.sinaapp.com";
+	public static string ServerIP = "localhost";
+//	public static string ServerIP = "hihijack.sinaapp.com";
 	
 	public static bool debug = false;
 	
