@@ -28,7 +28,7 @@ public class Chests : IInteractive {
 		int state = jdRes["state"].AsInt;
 		if(state == 0){
 			// 成功
-			gameView.GeneralShowTip("验证成功");
+			gameView.GeneralShowTip("验证成功!现在你的世界可以被其他冒险者看到了");
 			GameManager.IsVerify = true;
 		}else{
 			// 失败

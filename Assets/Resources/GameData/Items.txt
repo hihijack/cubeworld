@@ -1,50 +1,141 @@
 ﻿[
   {
     "id": 1,
-    "name": "方块",
+    "name": "石块",
     "resources_name": "cube",
-    "type":0
+    "type": 0
   },
   {
     "id": 2,
     "name": "玩家",
     "resources_name": "player",
-    "type":0
+    "type": 0
   },
-    {
+  {
     "id": 3,
     "name": "宝箱",
     "resources_name": "chest",
-    "type":0
+    "type": 0
   },
   {
     "id": 4,
     "name": "尖刺陷阱",
     "resources_name": "spiketrap",
-    "type":1
+    "type": 1
   },
   {
     "id": 5,
     "name": "升降台",
     "resources_name": "platfromupdown",
-    "type":1
-  } ,
+    "type": 1
+  },
   {
     "id": 6,
     "name": "落石陷阱",
     "resources_name": "stonetrap",
-    "type":1
+    "type": 1
   },
   {
     "id": 7,
     "name": "跳跃板",
     "resources_name": "superjump",
-    "type":1
+    "type": 1
   },
   {
     "id": 8,
     "name": "破裂的方块",
     "resources_name": "brokencube",
-    "type":1
+    "type": 1
+  },
+  {
+    "id": 9,
+    "name": "基石",
+    "resources_name": "basestone",
+    "type": 0
+  },
+  {
+    "id": 10,
+    "name": "砖块",
+    "resources_name": "brick",
+    "type": 0
+  },
+  {
+    "id": 11,
+    "name": "圆石",
+    "resources_name": "roundstone",
+    "type": 0
+  },
+  {
+    "id": 12,
+    "name": "沙子",
+    "resources_name": "sand",
+    "type": 0
+  },
+  {
+    "id": 13,
+    "name": "泥土",
+    "resources_name": "soil",
+    "type": 0
+  },
+  {
+    "id": 14,
+    "name": "石块",
+    "resources_name": "stonecube",
+    "type": 0
+  },
+  {
+    "id": 16,
+    "name": "白桦木板",
+    "resources_name": "birchwood",
+    "type": 0
+  },
+  {
+    "id": 17,
+    "name": "丛林木板",
+    "resources_name": "junglewood",
+    "type": 0
+  },
+  {
+    "id": 18,
+    "name": "草地",
+    "resources_name": "lawn",
+    "type": 0
+  },
+  {
+    "id": 19,
+    "name": "橡木木板",
+    "resources_name": "oakwood",
+    "type": 0
+  },
+  {
+    "id": 20,
+    "name": "云杉木板",
+    "resources_name": "sprucewood",
+    "type": 0
+  },
+  {
+    "id": 21,
+    "name": "绿叶",
+    "resources_name": "tree",
+    "type": 0
+  },
+  {
+    "id": 22,
+    "name": "树干",
+    "resources_name": "trunk",
+    "type": 0
+  },
+  {
+    "id": 23,
+    "name": "白桦树干",
+    "resources_name": "whitebirch",
+    "type": 0
+  }
+  ,
+  {
+    "id": 24,
+    "name": "秘密",
+    "resources_name": "secret",
+    "type": 1
   }
 ]

@@ -54,6 +54,8 @@ public class Main : MonoBehaviour {
 	int axisV = 0;
 	int axisH = 0;
 	
+	string strDebug = "";
+	
 	void Start () {
 		GameManager.GameModel = EGameModel.Edit;
 		
@@ -73,6 +75,10 @@ public class Main : MonoBehaviour {
 		}else{
 			StartCoroutine(CoRequestWorldData());
 		}
+		
+		// 帮助文本初始化
+		UILabel txtHelp = Tools.GetComponentInChildByPath<UILabel>(g_GobjPlane, "win_help/txt");
+		txtHelp.text = IText.HelpEditTxt;
 	}
 	
 	// Update is called once per frame
@@ -135,6 +141,13 @@ public class Main : MonoBehaviour {
 				}
 			}
 		}
+	}
+	
+	void OnGUI(){
+		if(GameManager.debug){
+			GUI.Label(new Rect(50f, 500f, 300f, 600f), strDebug);
+		}
+	
 	}
 	
 	public void OnModelChange(){
@@ -202,7 +215,6 @@ public class Main : MonoBehaviour {
 		
 		print("Response:" + strRes);//##########
 		
-		
 		if(!string.IsNullOrEmpty(strRes)){
 			JSONNode jd = JSONNode.Parse(strRes);
 			string strWorlddata = jd["worlddata"];
@@ -266,6 +278,8 @@ public class Main : MonoBehaviour {
 			int allCount = strCubes.Length + 1;
 			int curCount = 0;
 			
+			int countLoadPerFrame = 0;
+			
 			foreach (string item in strCubes) {
 				
 				// 载入进度
@@ -291,7 +305,12 @@ public class Main : MonoBehaviour {
 					Vector3 locPos = new Vector3(localX, localY, localZ);
 					cube.transform.localPosition = locPos;
 					cube.transform.localEulerAngles = Vector3.zero;
-					yield return 1;
+					
+					countLoadPerFrame ++;
+					if(countLoadPerFrame >= GameManager.LoadCountPerFrame){
+						countLoadPerFrame = 0;
+						yield return 1;
+					}
 				}
 			}
 		}
@@ -353,12 +372,16 @@ public class Main : MonoBehaviour {
 	}
 	
 	IEnumerator CoRequestSaveCubeData(string cubedata, bool toPlay){
-		WWW myWWW = new WWW("http://" + GameManager.ServerIP +"/cwserver/saveworlddata.php?playerid=" + GameManager.CurPlayerId + "&" + "worlddata=" + cubedata);
+		// post
+		WWWForm wf = new WWWForm();
+		wf.AddField("playerid", GameManager.CurPlayerId);
+		wf.AddField("worlddata", cubedata);
+		string url = "http://" + GameManager.ServerIP +"/cwserver/saveworlddata.php";
+		WWW myWWW = new WWW(url, wf);
+		
 		yield return  myWWW;
 		
 		string strRes = myWWW.text;
-		
-		print("Response:" + strRes);//##########
 		
 		JSONNode jd = JSONNode.Parse(strRes);
 		int state = jd["state"].AsInt;
@@ -417,6 +440,10 @@ public class Main : MonoBehaviour {
 				GameObject gobjItem = Tools.AddNGUIChild(gobjparent, IPath.UI + "ui_builditem");
 				UISprite us = Tools.GetComponentInChildByPath<UISprite>(gobjItem, "icon");
 				us.spriteName = "icon_" + item.resourceName;
+				
+				UILabel txtName = Tools.GetComponentInChildByPath<UILabel>(gobjItem, "name");
+				txtName.text = item.name;
+				
 				DataCache dc = gobjItem.AddComponent<DataCache>();
 				dc.data = item;
 			}

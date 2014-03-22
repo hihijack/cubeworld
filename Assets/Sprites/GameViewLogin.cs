@@ -41,7 +41,7 @@ public class GameViewLogin : MonoBehaviour {
 	}
 	
 	void OnGUI(){
-		GUI.Label(new Rect(50f, 50f, 300f, 300f), "V0.3");
+		GUI.Label(new Rect(50f, 50f, 300f, 300f), "V0.5");
 		
 		if(GameManager.debug){
 			GUI.Label(new Rect(50f, 400f, 300f, 600f), strDebug);
@@ -93,10 +93,14 @@ public class GameViewLogin : MonoBehaviour {
 		
 		// 取玩家列表
 		StartCoroutine(CoRequestPlayerList());
+		
+		//帮助内容
+		UILabel txtHelp = Tools.GetComponentInChildByPath<UILabel>(gGobjUI, "win_help/txt");
+		txtHelp.text = IText.HelpTxt;
 	}
 	
 	IEnumerator CoRequestPlayerList(){
-		WWW myWWW = new WWW("http://" + GameManager.ServerIP + "/cwserver/getplayerlist.php");
+		WWW myWWW = new WWW("http://" + GameManager.ServerIP + "/cwserver/getplayerlist.php?playerid=" + GameManager.CurPlayerId);
 		yield return myWWW;
 		
 		
@@ -116,6 +120,7 @@ public class GameViewLogin : MonoBehaviour {
 			int allcount = item["allcount"].AsInt;
 			int passcount = item["passcount"].AsInt;
 			int version = item["version"].AsInt;
+			int haspass = item["haspass"].AsInt;
 			
 			GameObject gobjItem = Tools.AddNGUIChild(gobjGrid, IPath.UI + "player_item");
 			gobjItem.name = "player_" + id;
@@ -131,6 +136,11 @@ public class GameViewLogin : MonoBehaviour {
 			
 			UILabel txtInfo = Tools.GetComponentInChildByPath<UILabel>(gobjItem, "playerinfo");
 			txtInfo.text = name + " " + "通过率" + strRate + "(" + passcount + " /"  + allcount + ")" + " V" + version;
+			
+			if(haspass > 0){
+				UISprite bg = Tools.GetComponentInChildByPath<UISprite>(gobjItem, "bg");
+				bg.color = Color.green;
+			}
 			
 			PlayerInfo pi = new PlayerInfo();
 			pi.id = id;

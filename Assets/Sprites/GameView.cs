@@ -49,11 +49,24 @@ public class GameView : MonoBehaviour
 	
 	GameObject gGobjKeyTip;// 按键提升
 	
+	GameObject gGobjSecret;
+	
 	void Start ()
 	{
 		GameManager.GameModel = EGameModel.Play;
 		// init hero
 		StartCoroutine(InitWorld());
+		
+		UILabel txtTargetName = Tools.GetComponentInChildByPath<UILabel>(g_GobjPlane, "target_name/txt");
+		if(GameManager.PlayModel == EPlayModel.Others){
+			txtTargetName.text = GameManager.CurTargetName + "的世界";
+		}else{
+			txtTargetName.text =  "我的世界";
+		}
+		
+		UILabel txtHelp = Tools.GetComponentInChildByPath<UILabel>(g_GobjPlane, "win_help/txt");
+		txtHelp.text = IText.HelpPlay;
+		
 	}
 	
 	// Update is called once per frame
@@ -212,6 +225,22 @@ public class GameView : MonoBehaviour
 		}
 	}
 	
+	public void ShowSecret(string strTxt){
+		gGobjSecret = Tools.AddNGUIChild(g_GobjPlane, IPath.UI + "secret");
+		UILabel txt = Tools.GetComponentInChildByPath<UILabel>(gGobjSecret, "txt");
+		txt.text = strTxt;
+	}
+	
+	public void HideSecret(){
+		if(gGobjSecret != null){
+			DestroyObject(gGobjSecret);
+		}
+	}
+	
+	public bool IsInSecret(){
+		return gGobjSecret != null;
+	}
+	
 	IEnumerator InitWorld(){
 		string worldData = "";
 		if(GameManager.PlayModel == EPlayModel.Mine && !string.IsNullOrEmpty(GameManager.MyWorldDataCache)){
@@ -232,6 +261,8 @@ public class GameView : MonoBehaviour
 			
 			int allCount = strCubes.Length + 1;
 			int curCount = 0;
+			
+			int countLoadPerFrame = 0;
 			
 			foreach (string item in strCubes) {
 				
@@ -256,7 +287,12 @@ public class GameView : MonoBehaviour
 				cube.transform.parent = cubeParent.transform;
 				Vector3 locPos = new Vector3(localX, localY, localZ);
 				cube.transform.localPosition = locPos;
-				yield return 1;
+				
+				countLoadPerFrame++;
+				if(countLoadPerFrame >= GameManager.LoadCountPerFrame){
+					countLoadPerFrame = 0;
+					yield return 1;
+				}
 			}
 			
 			// 创建玩家
@@ -318,7 +354,7 @@ public class GameView : MonoBehaviour
 		JSONNode jd = JSONNode.Parse(strRes);
 		int state = jd["state"].AsInt;
 		if(state == 0){
-			GeneralShowTip("挑战成功！获得了徽章《" + GameManager.CurPlayerName + "/V" + GameManager.CurVersion + "》");
+			GeneralShowTip("挑战成功！获得了徽章《" + GameManager.CurTargetName + "/V" + GameManager.CurVersion + "》");
 		}else{
 			GeneralShowTip("服务器错误");
 		}

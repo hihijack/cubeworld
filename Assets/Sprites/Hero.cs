@@ -109,7 +109,11 @@ public class Hero : IActor
 				}else if(btnA > 0){
 					updataState(new IActorAction(EFSMAction.HERO_ONAIR_UP));
 				}else if(btnB > 0){
-					InteractCur();
+					if(!gameView.IsInSecret()){
+						InteractCur();
+					}else{
+						gameView.HideSecret();
+					}
 				}
 			}
 		}
